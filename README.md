@@ -1,0 +1,2 @@
+# TechnicalService
+Blazor Web Assembly
