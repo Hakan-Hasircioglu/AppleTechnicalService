@@ -1,0 +1,51 @@
+﻿@page "/devices/create"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Devices</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Devices" OnValidSubmit="AddDevices" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="devicelbrand" class="form-label">DevicelBrand:</label> 
+                <InputText id="devicelbrand" @bind-Value="Devices.DevicelBrand" class="form-control" /> 
+                <ValidationMessage For="() => Devices.DevicelBrand" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="devicelmodel" class="form-label">DevicelModel:</label> 
+                <InputText id="devicelmodel" @bind-Value="Devices.DevicelModel" class="form-control" /> 
+                <ValidationMessage For="() => Devices.DevicelModel" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/devices">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Devices Devices { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddDevices()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Devices.Add(Devices);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/devices");
+    }
+}

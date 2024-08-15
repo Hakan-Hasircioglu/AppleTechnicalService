@@ -1,0 +1,31 @@
+﻿@page "/detailstables"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="detailstables/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DbFactory.CreateDbContext().Details">
+    <PropertyColumn Property="detailstable => detailstable.TypeOfService" />
+    <PropertyColumn Property="detailstable => detailstable.ServiceStatus" />
+    <PropertyColumn Property="detailstable => detailstable.ServiceCode" />
+    <PropertyColumn Property="detailstable => detailstable.Description" />
+    <PropertyColumn Property="detailstable => detailstable.PartsUsedForRepair" />
+    <PropertyColumn Property="detailstable => detailstable.Price" />
+    <PropertyColumn Property="detailstable => detailstable.ArrivalDate" />
+    <PropertyColumn Property="detailstable => detailstable.CompletionDate" />
+
+    <TemplateColumn Context="detailstable">
+        <a href="@($"detailstables/edit?id={detailstable.id}")">Edit</a> |
+        <a href="@($"detailstables/details?id={detailstable.id}")">Details</a> |
+        <a href="@($"detailstables/delete?id={detailstable.id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

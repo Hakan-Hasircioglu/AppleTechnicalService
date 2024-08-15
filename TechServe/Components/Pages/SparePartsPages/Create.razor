@@ -1,0 +1,81 @@
+﻿@page "/spareparts/create"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>SpareParts</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="SpareParts" OnValidSubmit="AddSpareParts" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="sparepartsbrand" class="form-label">SparePartsBrand:</label> 
+                <InputText id="sparepartsbrand" @bind-Value="SpareParts.SparePartsBrand" class="form-control" /> 
+                <ValidationMessage For="() => SpareParts.SparePartsBrand" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="sparepartsmodel" class="form-label">SparePartsModel:</label> 
+                <InputText id="sparepartsmodel" @bind-Value="SpareParts.SparePartsModel" class="form-control" /> 
+                <ValidationMessage For="() => SpareParts.SparePartsModel" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="partstype" class="form-label">PartsType:</label> 
+                <InputText id="partstype" @bind-Value="SpareParts.PartsType" class="form-control" /> 
+                <ValidationMessage For="() => SpareParts.PartsType" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="amountofspareparts" class="form-label">AmountOfSpareParts:</label> 
+                <InputNumber id="amountofspareparts" @bind-Value="SpareParts.AmountOfSpareParts" class="form-control" /> 
+                <ValidationMessage For="() => SpareParts.AmountOfSpareParts" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="barcode" class="form-label">Barcode:</label> 
+                <InputNumber id="barcode" @bind-Value="SpareParts.Barcode" class="form-control" /> 
+                <ValidationMessage For="() => SpareParts.Barcode" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="spareprice" class="form-label">SparePrice:</label> 
+                <InputNumber id="spareprice" @bind-Value="SpareParts.SparePrice" class="form-control" /> 
+                <ValidationMessage For="() => SpareParts.SparePrice" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="repairofcostofthepart" class="form-label">RepairOfCostOfThePart:</label> 
+                <InputNumber id="repairofcostofthepart" @bind-Value="SpareParts.RepairOfCostOfThePart" class="form-control" /> 
+                <ValidationMessage For="() => SpareParts.RepairOfCostOfThePart" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="replacementofcostofthepart" class="form-label">ReplacementOfCostOfThePart:</label> 
+                <InputNumber id="replacementofcostofthepart" @bind-Value="SpareParts.ReplacementOfCostOfThePart" class="form-control" /> 
+                <ValidationMessage For="() => SpareParts.ReplacementOfCostOfThePart" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/spareparts">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public SpareParts SpareParts { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddSpareParts()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.SpareParts.Add(SpareParts);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/spareparts");
+    }
+}

@@ -1,0 +1,85 @@
+﻿@page "/detailstables/delete"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>DetailsTable</h4>
+    <hr />
+    @if (detailstable is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">TypeOfService</dt>
+            <dd class="col-sm-10">@detailstable.TypeOfService</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ServiceStatus</dt>
+            <dd class="col-sm-10">@detailstable.ServiceStatus</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ServiceCode</dt>
+            <dd class="col-sm-10">@detailstable.ServiceCode</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@detailstable.Description</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">PartsUsedForRepair</dt>
+            <dd class="col-sm-10">@detailstable.PartsUsedForRepair</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@detailstable.Price</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ArrivalDate</dt>
+            <dd class="col-sm-10">@detailstable.ArrivalDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CompletionDate</dt>
+            <dd class="col-sm-10">@detailstable.CompletionDate</dd>
+        </dl>
+        <EditForm method="post" Model="detailstable" OnValidSubmit="DeleteDetailsTable" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(detailstable is null)">Delete</button> |
+            <a href="/detailstables">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    DetailsTable? detailstable;
+
+    [SupplyParameterFromQuery]
+    public int id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        detailstable = await context.Details.FirstOrDefaultAsync(m => m.id == id);
+
+        if (detailstable is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task DeleteDetailsTable()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Details.Remove(detailstable!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/detailstables");
+    }
+}

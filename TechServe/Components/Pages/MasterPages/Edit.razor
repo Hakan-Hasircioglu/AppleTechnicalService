@@ -1,0 +1,160 @@
+﻿@page "/Masters/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Master</h4>
+<hr />
+@if (Master is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Master" OnValidSubmit="UpdateMaster" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Master.id" value="@Master.id" />
+                <div class="mb-3">
+                    <label for="costumername" class="form-label">CostumerName:</label>
+                    <InputText id="costumername" @bind-Value="Master.CostumerName" class="form-control" />
+                    <ValidationMessage For="() => Master.CostumerName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone:</label>
+                    <InputNumber id="phone" @bind-Value="Master.Phone" class="form-control" />
+                    <ValidationMessage For="() => Master.Phone" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="e_mail" class="form-label">E_Mail:</label>
+                    <InputText id="e_mail" @bind-Value="Master.E_Mail" class="form-control" />
+                    <ValidationMessage For="() => Master.E_Mail" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="adress" class="form-label">Adress:</label>
+                    <InputText id="adress" @bind-Value="Master.Adress" class="form-control" />
+                    <ValidationMessage For="() => Master.Adress" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="city" class="form-label">City:</label>
+                    <InputText id="city" @bind-Value="Master.City" class="form-control" />
+                    <ValidationMessage For="() => Master.City" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="postalcode" class="form-label">PostalCode:</label>
+                    <InputNumber id="postalcode" @bind-Value="Master.PostalCode" class="form-control" />
+                    <ValidationMessage For="() => Master.PostalCode" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="devicelbrand" class="form-label">DevicelBrand:</label>
+                    <InputText id="devicelbrand" @bind-Value="Master.DevicelBrand" class="form-control" />
+                    <ValidationMessage For="() => Master.DevicelBrand" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="devicelmodel" class="form-label">DevicelModel:</label>
+                    <InputText id="devicelmodel" @bind-Value="Master.DevicelModel" class="form-control" />
+                    <ValidationMessage For="() => Master.DevicelModel" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="typeofservice" class="form-label">TypeOfService:</label>
+                    <InputText id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control" />
+                    <ValidationMessage For="() => Master.TypeOfService" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="servicestatus" class="form-label">ServiceStatus:</label>
+                    <InputText id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control" />
+                    <ValidationMessage For="() => Master.ServiceStatus" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="servicecode" class="form-label">ServiceCode:</label>
+                    <InputText id="servicecode" @bind-Value="Master.ServiceCode" class="form-control" />
+                    <ValidationMessage For="() => Master.ServiceCode" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Master.Description" class="form-control" />
+                    <ValidationMessage For="() => Master.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <InputNumber id="price" @bind-Value="Master.Price" class="form-control" />
+                    <ValidationMessage For="() => Master.Price" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="arrivaldate" class="form-label">ArrivalDate:</label>
+                    <InputDate id="arrivaldate" @bind-Value="Master.ArrivalDate" class="form-control" />
+                    <ValidationMessage For="() => Master.ArrivalDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="completiondate" class="form-label">CompletionDate:</label>
+                    <InputDate id="completiondate" @bind-Value="Master.CompletionDate" class="form-control" />
+                    <ValidationMessage For="() => Master.CompletionDate" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/masters">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Master? Master { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Master ??= await context.Master.FirstOrDefaultAsync(m => m.id == id);
+
+        if (Master is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateMaster()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Master!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MasterExists(Master!.id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/masters");
+    }
+
+    bool MasterExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Master.Any(e => e.id == id);
+    }
+}

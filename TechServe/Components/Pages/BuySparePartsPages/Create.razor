@@ -1,0 +1,71 @@
+﻿@page "/buyspareparts/create"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>BuySpareParts</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="BuySpareParts" OnValidSubmit="AddBuySpareParts" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="sparepartsbrand" class="form-label">SparePartsBrand:</label> 
+                <InputText id="sparepartsbrand" @bind-Value="BuySpareParts.SparePartsBrand" class="form-control" /> 
+                <ValidationMessage For="() => BuySpareParts.SparePartsBrand" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="sparepartsmodel" class="form-label">SparePartsModel:</label> 
+                <InputText id="sparepartsmodel" @bind-Value="BuySpareParts.SparePartsModel" class="form-control" /> 
+                <ValidationMessage For="() => BuySpareParts.SparePartsModel" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="partstype" class="form-label">PartsType:</label> 
+                <InputText id="partstype" @bind-Value="BuySpareParts.PartsType" class="form-control" /> 
+                <ValidationMessage For="() => BuySpareParts.PartsType" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="amountofspareparts" class="form-label">AmountOfSpareParts:</label> 
+                <InputNumber id="amountofspareparts" @bind-Value="BuySpareParts.AmountOfSpareParts" class="form-control" /> 
+                <ValidationMessage For="() => BuySpareParts.AmountOfSpareParts" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="barcode" class="form-label">Barcode:</label> 
+                <InputNumber id="barcode" @bind-Value="BuySpareParts.Barcode" class="form-control" /> 
+                <ValidationMessage For="() => BuySpareParts.Barcode" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="spareprice" class="form-label">SparePrice:</label> 
+                <InputNumber id="spareprice" @bind-Value="BuySpareParts.SparePrice" class="form-control" /> 
+                <ValidationMessage For="() => BuySpareParts.SparePrice" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/buyspareparts">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public BuySpareParts BuySpareParts { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddBuySpareParts()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.BuySpareParts.Add(BuySpareParts);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/buyspareparts");
+    }
+}

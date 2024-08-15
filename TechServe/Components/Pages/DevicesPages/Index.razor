@@ -1,0 +1,25 @@
+﻿@page "/devices"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="devices/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DbFactory.CreateDbContext().Devices">
+    <PropertyColumn Property="devices => devices.DevicelBrand" />
+    <PropertyColumn Property="devices => devices.DevicelModel" />
+
+    <TemplateColumn Context="devices">
+        <a href="@($"devices/edit?id={devices.id}")">Edit</a> |
+        <a href="@($"devices/details?id={devices.id}")">Details</a> |
+        <a href="@($"devices/delete?id={devices.id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

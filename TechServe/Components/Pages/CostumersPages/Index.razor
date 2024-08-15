@@ -1,0 +1,29 @@
+﻿@page "/costumers"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="costumers/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DbFactory.CreateDbContext().Costumers">
+    <PropertyColumn Property="costumers => costumers.CostumerName" />
+    <PropertyColumn Property="costumers => costumers.Phone" />
+    <PropertyColumn Property="costumers => costumers.E_Mail" />
+    <PropertyColumn Property="costumers => costumers.Adress" />
+    <PropertyColumn Property="costumers => costumers.City" />
+    <PropertyColumn Property="costumers => costumers.PostalCode" />
+
+    <TemplateColumn Context="costumers">
+        <a href="@($"costumers/edit?id={costumers.id}")">Edit</a> |
+        <a href="@($"costumers/details?id={costumers.id}")">Details</a> |
+        <a href="@($"costumers/delete?id={costumers.id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

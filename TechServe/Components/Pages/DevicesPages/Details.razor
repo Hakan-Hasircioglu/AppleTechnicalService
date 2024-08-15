@@ -1,0 +1,49 @@
+﻿@page "/devices/details"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Devices</h4>
+    <hr />
+    @if (devices is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">DevicelBrand</dt>
+            <dd class="col-sm-10">@devices.DevicelBrand</dd>
+            <dt class="col-sm-2">DevicelModel</dt>
+            <dd class="col-sm-10">@devices.DevicelModel</dd>
+        </dl>
+        <div>
+            <a href="@($"/devices/edit?id={devices.id}")">Edit</a> |
+            <a href="@($"/devices")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Devices? devices;
+
+    [SupplyParameterFromQuery]
+    public int id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        devices = await context.Devices.FirstOrDefaultAsync(m => m.id == id);
+
+        if (devices is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

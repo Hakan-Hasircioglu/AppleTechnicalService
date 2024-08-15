@@ -1,0 +1,125 @@
+﻿@page "/DetailsTables/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>DetailsTable</h4>
+<hr />
+@if (DetailsTable is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="DetailsTable" OnValidSubmit="UpdateDetailsTable" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="DetailsTable.id" value="@DetailsTable.id" />
+                <div class="mb-3">
+                    <label for="typeofservice" class="form-label">TypeOfService:</label>
+                    <InputText id="typeofservice" @bind-Value="DetailsTable.TypeOfService" class="form-control" />
+                    <ValidationMessage For="() => DetailsTable.TypeOfService" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="servicestatus" class="form-label">ServiceStatus:</label>
+                    <InputText id="servicestatus" @bind-Value="DetailsTable.ServiceStatus" class="form-control" />
+                    <ValidationMessage For="() => DetailsTable.ServiceStatus" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="servicecode" class="form-label">ServiceCode:</label>
+                    <InputText id="servicecode" @bind-Value="DetailsTable.ServiceCode" class="form-control" />
+                    <ValidationMessage For="() => DetailsTable.ServiceCode" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="DetailsTable.Description" class="form-control" />
+                    <ValidationMessage For="() => DetailsTable.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="partsusedforrepair" class="form-label">PartsUsedForRepair:</label>
+                    <InputText id="partsusedforrepair" @bind-Value="DetailsTable.PartsUsedForRepair" class="form-control" />
+                    <ValidationMessage For="() => DetailsTable.PartsUsedForRepair" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <InputNumber id="price" @bind-Value="DetailsTable.Price" class="form-control" />
+                    <ValidationMessage For="() => DetailsTable.Price" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="arrivaldate" class="form-label">ArrivalDate:</label>
+                    <InputDate id="arrivaldate" @bind-Value="DetailsTable.ArrivalDate" class="form-control" />
+                    <ValidationMessage For="() => DetailsTable.ArrivalDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="completiondate" class="form-label">CompletionDate:</label>
+                    <InputDate id="completiondate" @bind-Value="DetailsTable.CompletionDate" class="form-control" />
+                    <ValidationMessage For="() => DetailsTable.CompletionDate" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/detailstables">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int id { get; set; }
+
+    [SupplyParameterFromForm]
+    public DetailsTable? DetailsTable { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        DetailsTable ??= await context.Details.FirstOrDefaultAsync(m => m.id == id);
+
+        if (DetailsTable is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateDetailsTable()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(DetailsTable!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!DetailsTableExists(DetailsTable!.id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/detailstables");
+    }
+
+    bool DetailsTableExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Details.Any(e => e.id == id);
+    }
+}

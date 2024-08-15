@@ -1,0 +1,31 @@
+﻿@page "/spareparts"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="spareparts/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DbFactory.CreateDbContext().SpareParts">
+    <PropertyColumn Property="spareparts => spareparts.SparePartsBrand" />
+    <PropertyColumn Property="spareparts => spareparts.SparePartsModel" />
+    <PropertyColumn Property="spareparts => spareparts.PartsType" />
+    <PropertyColumn Property="spareparts => spareparts.AmountOfSpareParts" />
+    <PropertyColumn Property="spareparts => spareparts.Barcode" />
+    <PropertyColumn Property="spareparts => spareparts.SparePrice" />
+    <PropertyColumn Property="spareparts => spareparts.RepairOfCostOfThePart" />
+    <PropertyColumn Property="spareparts => spareparts.ReplacementOfCostOfThePart" />
+
+    <TemplateColumn Context="spareparts">
+        <a href="@($"spareparts/edit?id={spareparts.id}")">Edit</a> |
+        <a href="@($"spareparts/details?id={spareparts.id}")">Details</a> |
+        <a href="@($"spareparts/delete?id={spareparts.id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

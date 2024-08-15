@@ -1,0 +1,90 @@
+﻿@page "/masters"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+
+<PageTitle>Master</PageTitle>
+
+<h1>Master</h1>
+
+<p>
+    <a href="masters/create">Add New Device</a>
+</p>
+<div class="table-container">
+<QuickGrid Class="table table-striped table-hover" Items="DbFactory.CreateDbContext().Master">
+    <PropertyColumn Property="master => master.CostumerName" />
+@*     <PropertyColumn Property="master => master.Phone" />
+    <PropertyColumn Property="master => master.E_Mail" />
+    <PropertyColumn Property="master => master.Adress" />
+    <PropertyColumn Property="master => master.City" />
+    <PropertyColumn Property="master => master.PostalCode" /> *@
+    <PropertyColumn Property="master => master.DevicelBrand" />
+    <PropertyColumn Property="master => master.DevicelModel" />
+    <PropertyColumn Property="master => master.TypeOfService" />
+    <PropertyColumn Property="master => master.ServiceStatus" />
+    <PropertyColumn Property="master => master.ServiceCode" />
+    <PropertyColumn Property="master => master.Description" />
+    <PropertyColumn Property="master => master.Price" />
+@*     <PropertyColumn Property="master => master.ArrivalDate" />
+    <PropertyColumn Property="master => master.CompletionDate" /> *@
+
+    <TemplateColumn Context="master">
+        <a href="@($"masters/edit?id={master.id}")">Edit</a> |
+        <a href="@($"masters/details?id={master.id}")">Details</a> |
+        <a href="@($"masters/delete?id={master.id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+</div>
+
+   <style>
+    .table-container {
+        padding: 20px;
+        margin: 0 auto;
+        width: 100%;
+        overflow-x: auto; /* Taşma durumunda yatay kaydırma çubuğu göster */
+    }
+
+    .table {
+        width: 100%;
+        max-width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+    }
+
+        .table th, .table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Satır yüksekliğini azalt */
+        .table td {
+            padding: 6px 10px;
+            line-height: 1.2;
+        }
+
+        /* Tabloyu daha kompakt hale getirmek için padding ve font boyutlarını azaltın */
+        .table td, .table th {
+            padding: 4px;
+            font-size: 12px;
+        }
+
+    .table-container {
+        padding: 10px;
+    }
+    </style>

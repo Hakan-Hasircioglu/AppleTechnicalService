@@ -1,0 +1,125 @@
+﻿@page "/SpareParts/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>SpareParts</h4>
+<hr />
+@if (SpareParts is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="SpareParts" OnValidSubmit="UpdateSpareParts" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="SpareParts.id" value="@SpareParts.id" />
+                <div class="mb-3">
+                    <label for="sparepartsbrand" class="form-label">SparePartsBrand:</label>
+                    <InputText id="sparepartsbrand" @bind-Value="SpareParts.SparePartsBrand" class="form-control" />
+                    <ValidationMessage For="() => SpareParts.SparePartsBrand" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="sparepartsmodel" class="form-label">SparePartsModel:</label>
+                    <InputText id="sparepartsmodel" @bind-Value="SpareParts.SparePartsModel" class="form-control" />
+                    <ValidationMessage For="() => SpareParts.SparePartsModel" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="partstype" class="form-label">PartsType:</label>
+                    <InputText id="partstype" @bind-Value="SpareParts.PartsType" class="form-control" />
+                    <ValidationMessage For="() => SpareParts.PartsType" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="amountofspareparts" class="form-label">AmountOfSpareParts:</label>
+                    <InputNumber id="amountofspareparts" @bind-Value="SpareParts.AmountOfSpareParts" class="form-control" />
+                    <ValidationMessage For="() => SpareParts.AmountOfSpareParts" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="barcode" class="form-label">Barcode:</label>
+                    <InputNumber id="barcode" @bind-Value="SpareParts.Barcode" class="form-control" />
+                    <ValidationMessage For="() => SpareParts.Barcode" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="spareprice" class="form-label">SparePrice:</label>
+                    <InputNumber id="spareprice" @bind-Value="SpareParts.SparePrice" class="form-control" />
+                    <ValidationMessage For="() => SpareParts.SparePrice" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="repairofcostofthepart" class="form-label">RepairOfCostOfThePart:</label>
+                    <InputNumber id="repairofcostofthepart" @bind-Value="SpareParts.RepairOfCostOfThePart" class="form-control" />
+                    <ValidationMessage For="() => SpareParts.RepairOfCostOfThePart" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="replacementofcostofthepart" class="form-label">ReplacementOfCostOfThePart:</label>
+                    <InputNumber id="replacementofcostofthepart" @bind-Value="SpareParts.ReplacementOfCostOfThePart" class="form-control" />
+                    <ValidationMessage For="() => SpareParts.ReplacementOfCostOfThePart" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/spareparts">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int id { get; set; }
+
+    [SupplyParameterFromForm]
+    public SpareParts? SpareParts { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        SpareParts ??= await context.SpareParts.FirstOrDefaultAsync(m => m.id == id);
+
+        if (SpareParts is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateSpareParts()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(SpareParts!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!SparePartsExists(SpareParts!.id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/spareparts");
+    }
+
+    bool SparePartsExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.SpareParts.Any(e => e.id == id);
+    }
+}

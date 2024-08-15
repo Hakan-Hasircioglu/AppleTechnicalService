@@ -1,0 +1,61 @@
+﻿@page "/detailstables/details"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>DetailsTable</h4>
+    <hr />
+    @if (detailstable is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">TypeOfService</dt>
+            <dd class="col-sm-10">@detailstable.TypeOfService</dd>
+            <dt class="col-sm-2">ServiceStatus</dt>
+            <dd class="col-sm-10">@detailstable.ServiceStatus</dd>
+            <dt class="col-sm-2">ServiceCode</dt>
+            <dd class="col-sm-10">@detailstable.ServiceCode</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@detailstable.Description</dd>
+            <dt class="col-sm-2">PartsUsedForRepair</dt>
+            <dd class="col-sm-10">@detailstable.PartsUsedForRepair</dd>
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@detailstable.Price</dd>
+            <dt class="col-sm-2">ArrivalDate</dt>
+            <dd class="col-sm-10">@detailstable.ArrivalDate</dd>
+            <dt class="col-sm-2">CompletionDate</dt>
+            <dd class="col-sm-10">@detailstable.CompletionDate</dd>
+        </dl>
+        <div>
+            <a href="@($"/detailstables/edit?id={detailstable.id}")">Edit</a> |
+            <a href="@($"/detailstables")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    DetailsTable? detailstable;
+
+    [SupplyParameterFromQuery]
+    public int id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        detailstable = await context.Details.FirstOrDefaultAsync(m => m.id == id);
+
+        if (detailstable is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

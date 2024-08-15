@@ -1,0 +1,231 @@
+﻿@page "/masters/details"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Tecnical Service Form</h4>
+    <hr />
+    @if (master is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <!-- İlk satır -->
+            <div class="item one-half short">
+                <dt>CustomerName</dt>
+                <dd>@master.CostumerName</dd>
+            </div>
+
+            <div class="item one-half short">
+                <dt>E_Mail</dt>
+                <dd>@master.E_Mail</dd>
+            </div>
+
+            <!-- İkinci satır -->
+            <div class="item one-half short">
+                <dt>Phone</dt>
+                <dd>@master.Phone</dd>
+            </div>
+
+            <!-- Üçüncü satır -->
+            <div class="item full-width address">
+                <dt>Address</dt>
+                <dd>@master.Adress</dd>
+            </div>
+
+            <!-- Dördüncü satır -->
+            <div class="item half-width short">
+                <dt>City</dt>
+                <dd>@master.City</dd>
+            </div>
+            <div class="item half-width short">
+                <dt>PostalCode</dt>
+                <dd>@master.PostalCode</dd>
+            </div>
+
+            <!-- Ayrım çizgisi -->
+            <div class="separator"></div>
+
+            <!-- Beşinci satır -->
+            <div class="item half-width short">
+                <dt>DeviceBrand</dt>
+                <dd>@master.DevicelBrand</dd>
+            </div>
+            <div class="item half-width short">
+                <dt>DeviceModel</dt>
+                <dd>@master.DevicelModel</dd>
+            </div>
+
+            <!-- Altıncı satır -->
+            <div class="item one-third short">
+                <dt>TypeOfService</dt>
+                <dd>@master.TypeOfService</dd>
+            </div>
+            <div class="item one-third short">
+                <dt>ServiceStatus</dt>
+                <dd>@master.ServiceStatus</dd>
+            </div>
+            <div class="item one-third short">
+                <dt>ServiceCode</dt>
+                <dd>@master.ServiceCode</dd>
+            </div>
+
+            <!-- Yedinci satır -->
+            <div class="item full-width description">
+                <dt>Description</dt>
+                <dd>@master.Description</dd>
+            </div>
+
+            <!-- Ayrım çizgisi -->
+            <div class="separator"></div>
+
+            <!-- Sekizinci satır -->
+            <div class="item half-width short">
+                <dt>ArrivalDate</dt>
+                <dd>@master.ArrivalDate</dd>
+            </div>
+            <div class="item half-width short">
+                <dt>CompletionDate</dt>
+                <dd>@master.CompletionDate</dd>
+            </div>
+        </dl>
+
+
+        <div>
+            <a href="@($"/masters/edit?id={master.id}")" class="btn btn-edit">Edit</a>
+            <a href="@($"/masters")" class="btn btn-back">Back to List</a>
+        </div>
+
+
+    }
+</div>
+
+@code {
+    Master? master;
+
+    [SupplyParameterFromQuery]
+    public int id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        master = await context.Master.FirstOrDefaultAsync(m => m.id == id);
+
+        if (master is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
+<style>
+    /* Add this to your CSS file */
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
+
+
+
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 auto; /* Ortalamak için margin auto ekleyin */
+        max-width: 1200px; /* Maksimum genişliği belirleyin (isteğe bağlı) */
+        padding: 20px; /* Sağdan ve soldan boşluk ekleyin */
+        box-sizing: border-box;
+    }
+
+    .item {
+        box-sizing: border-box;
+        padding: 10px;
+        border-bottom: 1px solid transparent; /* Şu an gri çizgi yerine şeffaf çizgi */
+    }
+
+    .short {
+        height: 50px; /* Kısa satırlar için yükseklik */
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    .half-width {
+        width: 50%;
+    }
+
+    .one-half {
+        width: 50%;
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .one-third {
+        width: 33.33%;
+    }
+
+    .address,
+    .description {
+        height: auto; /* İçerik genişliğine göre yüksekliği ayarla */
+    }
+
+    .address {
+        border-bottom: 1px solid #ddd; /* Adres için sınır */
+    }
+
+    .description {
+        border-bottom: 1px solid #ddd; /* Açıklama için sınır */
+    }
+
+    .separator {
+        width: 100%;
+        height: 2px; /* Çizginin kalınlığı */
+        background-color: black;
+        margin: 10px 0; /* Çizgi etrafında boşluk */
+    }
+
+    /* Adres ve Açıklama dışındaki öğelerden sınırı kaldır */
+    .item:not(.address):not(.description) {
+        border-bottom: 0; /* Alt sınırı kaldır */
+    }
+
+</style>
