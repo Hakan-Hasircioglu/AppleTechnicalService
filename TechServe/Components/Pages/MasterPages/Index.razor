@@ -10,10 +10,10 @@
 <h1>Master</h1>
 
 <p>
-    <a href="masters/create">Add New Device</a>
+    <a href="masters/create" class="btn btn-edit">Add New Device</a>
 </p>
 <div class="table-container">
-<QuickGrid Class="table table-striped table-hover" Items="DbFactory.CreateDbContext().Master">
+    <QuickGrid Class="table table-striped table-hover" Items="DbFactory.CreateDbContext().Master">
     <PropertyColumn Property="master => master.CostumerName" />
 @*     <PropertyColumn Property="master => master.Phone" />
     <PropertyColumn Property="master => master.E_Mail" />
@@ -24,67 +24,106 @@
     <PropertyColumn Property="master => master.DevicelModel" />
     <PropertyColumn Property="master => master.TypeOfService" />
     <PropertyColumn Property="master => master.ServiceStatus" />
-    <PropertyColumn Property="master => master.ServiceCode" />
+@*     <PropertyColumn Property="master => master.ServiceCode" /> *@
     <PropertyColumn Property="master => master.Description" />
-    <PropertyColumn Property="master => master.Price" />
+    <PropertyColumn Property="master => master.Price"/>
 @*     <PropertyColumn Property="master => master.ArrivalDate" />
     <PropertyColumn Property="master => master.CompletionDate" /> *@
 
     <TemplateColumn Context="master">
-        <a href="@($"masters/edit?id={master.id}")">Edit</a> |
-        <a href="@($"masters/details?id={master.id}")">Details</a> |
-        <a href="@($"masters/delete?id={master.id}")">Delete</a>
+            <a href="@($"masters/edit?id={master.id}")" class="btn btn-edit btndiff">Edit</a> |
+            <a href="@($"masters/details?id={master.id}")" class="btn btn-edit btndiff">Details</a> |
+            <a href="@($"masters/delete?id={master.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
     </TemplateColumn>
 </QuickGrid>
 </div>
 
    <style>
+
+    /* Add this to your CSS file */
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
     .table-container {
-        padding: 20px;
-        margin: 0 auto;
         width: 100%;
-        overflow-x: auto; /* Taşma durumunda yatay kaydırma çubuğu göster */
+        overflow-x: auto; /* Ekrandan taşmayı engellemek için yatay kaydırma çubuğu ekler */
+        margin: 20px 0;
     }
 
     .table {
         width: 100%;
-        max-width: 100%;
-        border-collapse: collapse;
+        min-width: 800px; /* Tablo genişliği en az 800px olarak ayarlandı */
+        border-collapse: collapse; /* Tüm çizgileri birleştirir */
         font-family: Arial, sans-serif;
-        background-color: #ffffff;
-        border: 1px solid #ddd;
+        background-color: #ffffff; /* Arka plan beyaz */
+        color: #333; /* Yazı rengi */
     }
 
         .table th, .table td {
-            padding: 8px;
+            padding: 10px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
-            font-size: 14px;
+            border: 1px solid #87cefa; /* Açık mavi tonlarında kenarlık */
+            white-space: nowrap; /* Satırların tek satırda kalmasını sağlar */
         }
 
         .table th {
-            background-color: #f2f2f2;
+            background-color: #add8e6; /* Başlıklar için açık mavi */
             font-weight: bold;
-            color: #333;
         }
 
-        .table tr:hover {
-            background-color: #f9f9f9;
+        .table tr:nth-child(even) {
+            background-color: #e6f7ff; /* Çift satırlar için açık mavi arka plan */
         }
 
-        /* Satır yüksekliğini azalt */
-        .table td {
-            padding: 6px 10px;
-            line-height: 1.2;
-        }
+    .table-hover tbody tr:hover {
+        background-color: #b3e0ff; /* Üzerine gelindiğinde koyu mavi arka plan */
+    }
+    .btndiff{
+        padding: 0px 6px;
+        margin: 1px;
+        font-size: 9px;
+    }
 
-        /* Tabloyu daha kompakt hale getirmek için padding ve font boyutlarını azaltın */
-        .table td, .table th {
-            padding: 4px;
-            font-size: 12px;
-        }
+    .btndlt{
 
-    .table-container {
-        padding: 10px;
+        border-color: #ff0f00;
+        color: #ff0f00;
+    }
+
+    .btndlt:hover {
+        background-color: #ff0f00; 
+        color: white;
     }
     </style>

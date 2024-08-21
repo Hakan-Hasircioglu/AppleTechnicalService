@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "9GNQE/EoV656xqxqiZtH3p8xt/c00h1vPGyqBgXuhKo=",
+  "Hash": "23N6b9ezDbkWgwPdrnznRokgCTORX17TJHvg20k2JcM=",
   "Source": "TechServe",
   "BasePath": "_content/TechServe",
   "Mode": "Default",
@@ -53,6 +53,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Users\\hasir\\.nuget\\packages\\microsoft.aspnetcore.components.quickgrid\\8.0.7\\staticwebassets\\QuickGrid.razor.js"
+    },
+    {
+      "Identity": "C:\\Users\\hasir\\.nuget\\packages\\solutaris.infoware.protectedbrowserstorage\\1.0.2\\staticwebassets\\config.js",
+      "SourceId": "Solutaris.InfoWARE.ProtectedBrowserStorage",
+      "SourceType": "Package",
+      "ContentRoot": "C:\\Users\\hasir\\.nuget\\packages\\solutaris.infoware.protectedbrowserstorage\\1.0.2\\staticwebassets\\",
+      "BasePath": "_content/Solutaris.InfoWARE.ProtectedBrowserStorage",
+      "RelativePath": "config.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\hasir\\.nuget\\packages\\solutaris.infoware.protectedbrowserstorage\\1.0.2\\staticwebassets\\config.js"
     },
     {
       "Identity": "C:\\Users\\hasir\\source\\repos\\TechServe\\TechServe\\obj\\Debug\\net8.0\\scopedcss\\bundle\\TechServe.styles.css",

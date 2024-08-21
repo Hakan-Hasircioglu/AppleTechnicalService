@@ -65,17 +65,13 @@
             </div>
 
             <!-- Altıncı satır -->
-            <div class="item one-third short">
+            <div class="item half-width short">
                 <dt>TypeOfService</dt>
                 <dd>@master.TypeOfService</dd>
             </div>
-            <div class="item one-third short">
+            <div class="item half-width short">
                 <dt>ServiceStatus</dt>
                 <dd>@master.ServiceStatus</dd>
-            </div>
-            <div class="item one-third short">
-                <dt>ServiceCode</dt>
-                <dd>@master.ServiceCode</dd>
             </div>
 
             <!-- Yedinci satır -->
@@ -87,20 +83,42 @@
             <!-- Ayrım çizgisi -->
             <div class="separator"></div>
 
+            <div class="item half-width short">
+                <dt>ServiceCode</dt>
+                <dd>@master.ServiceCode</dd>
+            </div>
+            <div class="item half-width short">
+                <dt>Price</dt>
+                <dd>@master.Price</dd>
+            </div>
+
             <!-- Sekizinci satır -->
             <div class="item half-width short">
                 <dt>ArrivalDate</dt>
                 <dd>@master.ArrivalDate</dd>
             </div>
             <div class="item half-width short">
-                <dt>CompletionDate</dt>
-                <dd>@master.CompletionDate</dd>
+           
+            <dt>CompletionDate</dt>
+            <dd>
+                @if (master.CompletionDate == DateOnly.MinValue)
+                {
+                    <span>Not Completed</span>
+                }
+                else
+                {
+                    <span>@master.CompletionDate.ToString("yyyy-MM-dd")</span>
+                }
+            </dd>
             </div>
         </dl>
 
 
         <div>
             <a href="@($"/masters/edit?id={master.id}")" class="btn btn-edit">Edit</a>
+        </div>
+
+        <div>
             <a href="@($"/masters")" class="btn btn-back">Back to List</a>
         </div>
 
@@ -161,9 +179,6 @@
             background-color: #6c757d; /* Gray background on hover */
             color: white; /* White text on hover */
         }
-
-
-
 
 
     .row {

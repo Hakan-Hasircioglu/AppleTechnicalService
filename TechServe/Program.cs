@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TechServe.Data;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddDbContextFactory<TechServeContext>(options =>
  
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
+builder.Services.AddScoped<ProtectedSessionStorage>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

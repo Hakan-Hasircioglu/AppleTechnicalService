@@ -17,97 +17,162 @@
 }
 else
 {
-    <div class="row">
-        <div class="col-md-4">
+    <div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
             <EditForm method="post" Model="Master" OnValidSubmit="UpdateMaster" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary />
+                <ValidationSummary class="text-danger" />
                 <input type="hidden" name="Master.id" value="@Master.id" />
                 <div class="mb-3">
-                    <label for="costumername" class="form-label">CostumerName:</label>
+                    <label for="costumername" class="form-label">Costumer Name:</label>
                     <InputText id="costumername" @bind-Value="Master.CostumerName" class="form-control" />
                     <ValidationMessage For="() => Master.CostumerName" class="text-danger" />
                 </div>
-                <div class="mb-3">
-                    <label for="phone" class="form-label">Phone:</label>
-                    <InputNumber id="phone" @bind-Value="Master.Phone" class="form-control" />
-                    <ValidationMessage For="() => Master.Phone" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="e_mail" class="form-label">E_Mail:</label>
-                    <InputText id="e_mail" @bind-Value="Master.E_Mail" class="form-control" />
-                    <ValidationMessage For="() => Master.E_Mail" class="text-danger" />
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Phone:</label>
+                            <InputText id="phone" @bind-Value="Master.Phone" class="form-control" />
+                        <ValidationMessage For="() => Master.Phone" class="text-danger" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="e_mail" class="form-label">E_Mail:</label>
+                        <InputText id="e_mail" @bind-Value="Master.E_Mail" class="form-control" />
+                        <ValidationMessage For="() => Master.E_Mail" class="text-danger" />
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="adress" class="form-label">Adress:</label>
                     <InputText id="adress" @bind-Value="Master.Adress" class="form-control" />
                     <ValidationMessage For="() => Master.Adress" class="text-danger" />
                 </div>
-                <div class="mb-3">
-                    <label for="city" class="form-label">City:</label>
-                    <InputText id="city" @bind-Value="Master.City" class="form-control" />
-                    <ValidationMessage For="() => Master.City" class="text-danger" />
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="city" class="form-label">City:</label>
+                        <InputSelect id="city" @bind-Value="Master.City" class="form-control">
+                            @foreach (var city in CityOptions)
+                            {
+                                <option value="@city">@city</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => Master.Adress" class="text-danger" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="postalcode" class="form-label">Postal Code:</label>
+                            <InputText id="postalcode" @bind-Value="Master.PostalCode" class="form-control" />
+                        <ValidationMessage For="() => Master.PostalCode" class="text-danger" />
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="postalcode" class="form-label">PostalCode:</label>
-                    <InputNumber id="postalcode" @bind-Value="Master.PostalCode" class="form-control" />
-                    <ValidationMessage For="() => Master.PostalCode" class="text-danger" />
+                <div class="row mb-3">
+
+                    <div class="col-md-3">
+                        <label for="servicestatus" class="form-label">Service Status:</label>
+                        <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control">
+                            @foreach (var status in ServiceStatusOptions)
+                            {
+                                <option value="@status">@status</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => Master.ServiceStatus" class="text-danger" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="usedparts" class="form-label">Repaired:</label>
+                        <div class="expandable-list">
+                            <button class="btn btn-primary custom-button" @onclick="ToggleList">
+                                    Parts
+                            </button>
+
+                            @if (isExpanded)
+                            {
+                                <div class="checkbox-list">
+                                    @foreach (var item in partsTypes)
+                                    {
+                                        var truncatedPartsType = item.PartsType.Length > 16
+                                        ? item.PartsType.Substring(0, 16) + "..."
+                                        : item.PartsType;
+
+                                        <div class="col-md-4">
+                                            <input type="checkbox" id="@truncatedPartsType" value="@truncatedPartsType"
+                                                   @onchange="eventArgs => OnCheckboxChanged(eventArgs, item)"
+                                                   checked="@IsChecked(item)" />
+                                            <label for="@truncatedPartsType">@truncatedPartsType</label>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="devicelbrand" class="form-label">DevicelBrand:</label>
-                    <InputText id="devicelbrand" @bind-Value="Master.DevicelBrand" class="form-control" />
-                    <ValidationMessage For="() => Master.DevicelBrand" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="devicelmodel" class="form-label">DevicelModel:</label>
-                    <InputText id="devicelmodel" @bind-Value="Master.DevicelModel" class="form-control" />
-                    <ValidationMessage For="() => Master.DevicelModel" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="typeofservice" class="form-label">TypeOfService:</label>
-                    <InputText id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control" />
-                    <ValidationMessage For="() => Master.TypeOfService" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="servicestatus" class="form-label">ServiceStatus:</label>
-                    <InputText id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control" />
-                    <ValidationMessage For="() => Master.ServiceStatus" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="servicecode" class="form-label">ServiceCode:</label>
-                    <InputText id="servicecode" @bind-Value="Master.ServiceCode" class="form-control" />
-                    <ValidationMessage For="() => Master.ServiceCode" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description:</label>
-                    <InputText id="description" @bind-Value="Master.Description" class="form-control" />
-                    <ValidationMessage For="() => Master.Description" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="price" class="form-label">Price:</label>
-                    <InputNumber id="price" @bind-Value="Master.Price" class="form-control" />
-                    <ValidationMessage For="() => Master.Price" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="arrivaldate" class="form-label">ArrivalDate:</label>
-                    <InputDate id="arrivaldate" @bind-Value="Master.ArrivalDate" class="form-control" />
-                    <ValidationMessage For="() => Master.ArrivalDate" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="completiondate" class="form-label">CompletionDate:</label>
-                    <InputDate id="completiondate" @bind-Value="Master.CompletionDate" class="form-control" />
-                    <ValidationMessage For="() => Master.CompletionDate" class="text-danger" />
-                </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="arrivaldate" class="form-label">Arrival lDate:</label>
+                            <InputDate id="arrivaldate" @bind-Value="Master.ArrivalDate" class="form-control" />
+                            <ValidationMessage For="() => Master.ArrivalDate" class="text-danger" />
+                        </div>
+                        @if (Master.ServiceStatus == "Completed")
+                        {
+                            Master.CompletionDate = DateOnly.FromDateTime(DateTime.Today);
+                            <div class="col-md-6">
+                                <label for="completiondate" class="form-label">Completion Date:</label>
+                                <InputDate id="completiondate" @bind-Value="Master.CompletionDate" class="form-control" />
+                                <ValidationMessage For="() => Master.CompletionDate" class="text-danger" />
+                            </div>
+                        }
+                        else
+                        {
+                            Master.CompletionDate = DateOnly.MinValue;
+                        }
+                    </div>
+                <button type="submit" class="btn btn-edit">Save</button>
             </EditForm>
         </div>
+    </div>
     </div>
 }
 
 <div>
-    <a href="/masters">Back to List</a>
+    <a href="/masters" class="btn btn-back">Back to List</a>
 </div>
 
+<style>
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
+</style>
 @code {
     [SupplyParameterFromQuery]
     public int id { get; set; }
@@ -125,7 +190,83 @@ else
             NavigationManager.NavigateTo("notfound");
         }
     }
+        private void OnBrandChanged(ChangeEventArgs e)
+    {
+        // Clear the selected model if the brand is changed
+        Master.DevicelModel = null;
+        StateHasChanged();
+    }
+    // Options for Device Brand
+    private List<string> DeviceBrandOptions = new List<string>
+    {
+        "Apple",
+        "Samsung"
+    };
+    private List<string> DeviceModelOptions = new List<string>
+    {
+        "iPhone 11",
+        "iPhone 11 Pro",
+        "iPhone 11 Pro Max",
+        "iPhone 12",
+        "iPhone 12 Pro",
+        "iPhone 12 Pro Max",
+        "iPhone 13",
+        "iPhone 13 Pro",
+        "iPhone 13 Pro Max",
+        "iPhone 14",
+        "iPhone 14 Pro",
+        "iPhone 14 Pro Max",
+        "iPhone 15",
+        "iPhone 15 Pro",
+        "iPhone 15 Pro Max",
 
+    };
+    private List<string> CityOptions = new List<string>
+    {
+        "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya", "Artvin", "Aydın",
+        "Balıkesir", "Bartın", "Batman", "Bayburt", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa",
+        "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Düzce", "Edirne", "Elazığ", "Erzincan", "Erzurum",
+        "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Iğdır", "Isparta", "İstanbul", "İzmir",
+        "Kahramanmaraş", "Karabük", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kırıkkale", "Kırklareli", "Kırşehir",
+        "Kilis", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin", "Mersin", "Muğla", "Muş",
+        "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Şanlıurfa", "Şırnak", "Siirt",
+        "Sinop", "Sivas", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
+    };
+
+    // Options for Type of Service
+    private List<string> TypeOfServiceOptions = new List<string>
+    {
+        "Repair",
+        "Replacement",
+    };
+
+    // Options for Service Status
+    private List<string> ServiceStatusOptions = new List<string>
+    {
+        "Pending",
+        "In Progress",
+        "Completed"
+    };
+
+    private List<string> FilteredDeviceModelOptions => Master.DevicelBrand == "Apple"
+        ? DeviceModelOptions.Where(m => m.StartsWith("iPhone")).ToList()
+        : new List<string>();
+
+    private void OnStatusChanged(ChangeEventArgs e)
+    {
+        Master.ServiceStatus = e.Value.ToString();
+
+        // Status "completed" olduğunda tarih seçiciyi gösterir
+        if (Master.ServiceStatus == "Completed")
+        {
+            // Tarih seçici görünüyorsa, tarihi bugünün tarihi olarak ayarla
+            // Master.CompletionDate = DateOnly.FromDateTime(DateTime.Today);
+        }
+        else
+        {
+            Master.CompletionDate = DateOnly.MinValue;
+        }
+    }
     // To protect from overposting attacks, enable the specific properties you want to bind to.
     // For more details, see https://aka.ms/RazorPagesCRUD.
     public async Task UpdateMaster()
@@ -158,3 +299,78 @@ else
         return context.Master.Any(e => e.id == id);
     }
 }
+<style>
+    .expandable-list {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .custom-button {
+        height: 20px;
+        line-height: 0px;
+        font-size: 14px;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .checkbox-list {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        width: 500%;
+        background-color: white;
+        border: 1px solid #ddd;
+        z-index: 10;
+        ;
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        transform: translateX(-50%);
+        display: flex;
+        flex-wrap: wrap;
+        padding: 20px;
+    }
+
+    .form-check {
+        flex: 1 0 33%;
+        margin: 20px;
+        display: inline-block;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
+</style>
