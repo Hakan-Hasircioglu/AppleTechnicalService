@@ -188,12 +188,25 @@
     public ServiceCodeCreater ServiceCodeCreater { get; set; } = new();
 
     // Options for Device Brand
-    private List<string> DeviceBrandOptions = new List<string>
-    {
-        "Apple",
-        "Samsung"
-    };
 
+
+
+
+    protected override void OnInitialized()
+    {
+        Master.City = "";
+        Master.DevicelBrand = "";
+        Master.DevicelModel = "";
+        Master.TypeOfService = "";
+        Master.ServiceStatus = "";
+    }
+
+    private void OnBrandChanged(ChangeEventArgs e)
+    {
+        // Clear the selected model if the brand is changed
+        Master.DevicelModel = null;
+        StateHasChanged();
+    }
 
     #region ChechBox
     private List<SpareParts> partsTypes;
@@ -268,24 +281,11 @@
     private List<string> FilteredDeviceModelOptions => Master.DevicelBrand == "Apple"
         ? DeviceModelOptions.Where(m => m.StartsWith("iPhone")).ToList()
         : new List<string>();
-
-    protected override void OnInitialized()
+    private List<string> DeviceBrandOptions = new List<string>
     {
-        Master.City = "";
-        Master.DevicelBrand = "";
-        Master.DevicelModel = "";
-        Master.TypeOfService = "";
-        Master.ServiceStatus = "";
-    }
-
-    private void OnBrandChanged(ChangeEventArgs e)
-    {
-        // Clear the selected model if the brand is changed
-        Master.DevicelModel = null;
-        StateHasChanged();
-    }
-
-
+        "Apple",
+        "Samsung"
+    };
     // Options for Device Model
     private List<string> DeviceModelOptions = new List<string>
     {

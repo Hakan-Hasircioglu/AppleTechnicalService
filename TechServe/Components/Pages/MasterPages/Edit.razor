@@ -2,8 +2,14 @@
 
 @using Microsoft.EntityFrameworkCore
 @using TechServe.Model
+@using TechServe.Data
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using System.Text.Json
+
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 @inject NavigationManager NavigationManager
+@inject TechServeContext DbContext
+@inject ProtectedSessionStorage sessionStorage
 
 <PageTitle>Edit</PageTitle>
 
@@ -18,92 +24,138 @@
 else
 {
     <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <EditForm method="post" Model="Master" OnValidSubmit="UpdateMaster" FormName="edit" Enhance>
-                <DataAnnotationsValidator />
-                <ValidationSummary class="text-danger" />
-                <input type="hidden" name="Master.id" value="@Master.id" />
-                <div class="mb-3">
-                    <label for="costumername" class="form-label">Costumer Name:</label>
-                    <InputText id="costumername" @bind-Value="Master.CostumerName" class="form-control" />
-                    <ValidationMessage For="() => Master.CostumerName" class="text-danger" />
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="phone" class="form-label">Phone:</label>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <EditForm method="post" Model="Master" OnValidSubmit="UpdateMaster" FormName="create" Enhance>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
+                    <div class="mb-3">
+                        <label for="costumername" class="form-label">Costumer Name:</label>
+                        <InputText id="costumername" @bind-Value="Master.CostumerName" class="form-control" />
+                        <ValidationMessage For="() => Master.CostumerName" class="text-danger" />
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Phone:</label>
                             <InputText id="phone" @bind-Value="Master.Phone" class="form-control" />
-                        <ValidationMessage For="() => Master.Phone" class="text-danger" />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="e_mail" class="form-label">E_Mail:</label>
-                        <InputText id="e_mail" @bind-Value="Master.E_Mail" class="form-control" />
-                        <ValidationMessage For="() => Master.E_Mail" class="text-danger" />
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label for="adress" class="form-label">Adress:</label>
-                    <InputText id="adress" @bind-Value="Master.Adress" class="form-control" />
-                    <ValidationMessage For="() => Master.Adress" class="text-danger" />
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="city" class="form-label">City:</label>
-                        <InputSelect id="city" @bind-Value="Master.City" class="form-control">
-                            @foreach (var city in CityOptions)
-                            {
-                                <option value="@city">@city</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => Master.Adress" class="text-danger" />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="postalcode" class="form-label">Postal Code:</label>
-                            <InputText id="postalcode" @bind-Value="Master.PostalCode" class="form-control" />
-                        <ValidationMessage For="() => Master.PostalCode" class="text-danger" />
-                    </div>
-                </div>
-                <div class="row mb-3">
-
-                    <div class="col-md-3">
-                        <label for="servicestatus" class="form-label">Service Status:</label>
-                        <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control">
-                            @foreach (var status in ServiceStatusOptions)
-                            {
-                                <option value="@status">@status</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => Master.ServiceStatus" class="text-danger" />
-                    </div>
-                    <div class="col-md-3">
-                        <label for="usedparts" class="form-label">Repaired:</label>
-                        <div class="expandable-list">
-                            <button class="btn btn-primary custom-button" @onclick="ToggleList">
-                                    Parts
-                            </button>
-
-                            @if (isExpanded)
-                            {
-                                <div class="checkbox-list">
-                                    @foreach (var item in partsTypes)
-                                    {
-                                        var truncatedPartsType = item.PartsType.Length > 16
-                                        ? item.PartsType.Substring(0, 16) + "..."
-                                        : item.PartsType;
-
-                                        <div class="col-md-4">
-                                            <input type="checkbox" id="@truncatedPartsType" value="@truncatedPartsType"
-                                                   @onchange="eventArgs => OnCheckboxChanged(eventArgs, item)"
-                                                   checked="@IsChecked(item)" />
-                                            <label for="@truncatedPartsType">@truncatedPartsType</label>
-                                        </div>
-                                    }
-                                </div>
-                            }
+                            <ValidationMessage For="() => Master.Phone" class="text-danger" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="e_mail" class="form-label">E_Mail:</label>
+                            <InputText id="e_mail" @bind-Value="Master.E_Mail" class="form-control" />
+                            <ValidationMessage For="() => Master.E_Mail" class="text-danger" />
                         </div>
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <label for="adress" class="form-label">Adress:</label>
+                        <InputText id="adress" @bind-Value="Master.Adress" class="form-control" />
+                        <ValidationMessage For="() => Master.Adress" class="text-danger" />
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="city" class="form-label">City:</label>
+                            <InputSelect id="city" @bind-Value="Master.City" class="form-control">
+                                @foreach (var city in CityOptions)
+                                {
+                                    <option value="@city">@city</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => Master.Adress" class="text-danger" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="postalcode" class="form-label">Postal Code:</label>
+                            <InputText id="postalcode" @bind-Value="Master.PostalCode" class="form-control" />
+                            <ValidationMessage For="() => Master.PostalCode" class="text-danger" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="devicelbrand" class="form-label">Device Brand:</label>
+                            <InputSelect id="devicelbrand" @bind-Value="Master.DevicelBrand" class="form-control" @onchange="OnBrandChanged">
+                                @foreach (var brand in DeviceBrandOptions)
+                                {
+                                    <option value="@brand">@brand</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => Master.DevicelBrand" class="text-danger" />
+                        </div>
 
+                        @if (Master.DevicelBrand == "Apple")
+                        {
+                            <div class="col-md-6">
+                                <label for="devicelmodel" class="form-label">Device Model:</label>
+                                <InputSelect id="devicelmodel" @bind-Value="Master.DevicelModel" class="form-control">
+                                    @foreach (var model in FilteredDeviceModelOptions)
+                                    {
+                                        <option value="@model">@model</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="() => Master.DevicelModel" class="text-danger" />
+                            </div>
+                        }
+                        else
+                        {
+                            Master.DevicelModel = "";
+                        }
+                    </div>
+                    <div class="row mb-3">
+
+                        <div class="col-md-3">
+                            <label for="servicestatus" class="form-label">Service Status:</label>
+                            <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control">
+                                @foreach (var status in ServiceStatusOptions)
+                                {
+                                    <option value="@status">@status</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => Master.ServiceStatus" class="text-danger" />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="usedparts" class="form-label">Repaired:</label>
+                            <div class="expandable-list">
+                                <button class="btn btn-primary custom-button" @onclick="ToggleList">
+                                    Parts
+                                </button>
+
+                                @if (isExpanded)
+                                {
+                                    <div class="checkbox-list">
+                                        @foreach (var item in partsTypes)
+                                        {
+                                            var truncatedPartsType = item.PartsType.Length > 16
+                                            ? item.PartsType.Substring(0, 16) + "..."
+                                            : item.PartsType;
+
+                                            <div class="col-md-4">
+                                                <input type="checkbox" id="@truncatedPartsType" value="@truncatedPartsType"
+                                                       @onchange="eventArgs => OnCheckboxChanged(eventArgs, item)"
+                                                       checked="@IsChecked(item)" />
+                                                <label for="@truncatedPartsType">@truncatedPartsType</label>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="servicecode" class="form-label">Service Code:</label>
+                            <InputText id="servicecode" @bind-Value="Master.ServiceCode" class="form-control" Readonly />
+                            <ValidationMessage For="() => Master.ServiceCode" class="text-danger" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="price" class="form-label">Price:</label>
+                            <InputNumber id="price" @bind-Value="Master.Price" class="form-control" Readonly />
+                            <ValidationMessage For="() => Master.Price" class="text-danger" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description:</label>
+                        <InputText id="description" @bind-Value="Master.Description" class="form-control" />
+                        <ValidationMessage For="() => Master.Description" class="text-danger" />
+                    </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="arrivaldate" class="form-label">Arrival lDate:</label>
@@ -124,55 +176,16 @@ else
                             Master.CompletionDate = DateOnly.MinValue;
                         }
                     </div>
-                <button type="submit" class="btn btn-edit">Save</button>
-            </EditForm>
+                    <button type="submit" class="btn btn-edit">Create</button>
+                </EditForm>
+            </div>
         </div>
     </div>
-    </div>
-}
-
+    }
 <div>
-    <a href="/masters" class="btn btn-back">Back to List</a>
+    <a href="/masters">Back to List</a>
 </div>
 
-<style>
-
-    .btn {
-        display: inline-block;
-        padding: 10px 20px;
-        margin: 5px;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
-        text-decoration: none;
-        border-radius: 5px;
-        border: 2px solid; /* Thicker border */
-        background-color: transparent; /* Transparent background */
-        color: currentColor; /* Uses the color of the border */
-        transition: background-color 0.3s, color 0.3s;
-    }
-
-    .btn-edit {
-        border-color: #007bff; /* Blue border */
-        color: #007bff; /* Blue text */
-    }
-
-        .btn-edit:hover {
-            background-color: #007bff; /* Blue background on hover */
-            color: white; /* White text on hover */
-        }
-
-    .btn-back {
-        border-color: #6c757d; /* Gray border */
-        color: #6c757d; /* Gray text */
-    }
-
-        .btn-back:hover {
-            background-color: #6c757d; /* Gray background on hover */
-            color: white; /* White text on hover */
-        }
-
-</style>
 @code {
     [SupplyParameterFromQuery]
     public int id { get; set; }
@@ -182,6 +195,14 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        // First Expandable Table
+        partsTypes = await DbContext.SpareParts
+    .Select(sp => new SpareParts { PartsType = sp.PartsType, RepairOfCostOfThePart = sp.RepairOfCostOfThePart })
+    .Distinct()
+    .ToListAsync();
+
+        // Checkbox seçim durumunu yükle (State korumak için)
+        LoadSelectedPartsTypes();
         using var context = DbFactory.CreateDbContext();
         Master ??= await context.Master.FirstOrDefaultAsync(m => m.id == id);
 
@@ -190,18 +211,91 @@ else
             NavigationManager.NavigateTo("notfound");
         }
     }
-        private void OnBrandChanged(ChangeEventArgs e)
+    #region ChechBox
+    private List<SpareParts> partsTypes;
+    private HashSet<SpareParts> selectedParts = new HashSet<SpareParts>();
+    private bool isExpanded = false;
+    private float RepairPrice;
+    private float ReplacementPrice;
+    private void OnBrandChanged(ChangeEventArgs e)
     {
         // Clear the selected model if the brand is changed
         Master.DevicelModel = null;
         StateHasChanged();
     }
-    // Options for Device Brand
+
+    private List<CheckboxItem> items = new List<CheckboxItem>();
+
+    private void ToggleList()
+    {
+        isExpanded = !isExpanded;
+    }
+
+    public class CheckboxItem
+    {
+        public string Id { get; set; }
+        public string Text { get; set; }
+        public bool IsChecked { get; set; }
+    }
+    private HashSet<string> selectedPartsTypes = new HashSet<string>();
+
+    private async Task OnCheckboxChanged(ChangeEventArgs e, SpareParts part)
+    {
+        if ((bool)e.Value) // Eğer checkbox işaretlendiyse
+        {
+            selectedParts.Add(part); // Seçili listeye ekle
+            RepairPrice += part.RepairOfCostOfThePart; // Price'a ekle
+        }
+        else
+        {
+            selectedParts.Remove(part); // Seçili listeden çıkar
+            RepairPrice -= part.RepairOfCostOfThePart; // Price'tan çıkar
+        }
+        // Checkbox seçim durumunu kaydet
+        await SaveSelectedPartsTypes();
+    }
+
+    private bool IsChecked(SpareParts part)
+    {
+        LoadSelectedPartsTypes();
+        return selectedParts.Contains(part); // part'ı direkt olarak kontrol eder
+    }
+    private async Task SaveSelectedPartsTypes()
+    {
+        // Seçili checkbox durumunu JSON formatında session storage'a kaydet
+        var json = JsonSerializer.Serialize(selectedParts.Select(p => p.PartsType));
+        await sessionStorage.SetAsync("SelectedPartsTypes", json);
+    }
+
+    private async Task LoadSelectedPartsTypes()
+    {
+        var result = await sessionStorage.GetAsync<string>("SelectedPartsTypes");
+        var json = result.Success ? result.Value : null;
+        if (!string.IsNullOrEmpty(json))
+        {
+            var partsTypesFromStorage = JsonSerializer.Deserialize<List<string>>(json);
+
+            // partsTypes'dan seçili olanları bul
+            selectedParts = partsTypes
+                .Where(p => partsTypesFromStorage.Contains(p.PartsType))
+                .ToHashSet();
+
+            // Price'ı güncelle
+            RepairPrice = selectedParts.Sum(p => p.RepairOfCostOfThePart);
+        }
+        Master.Price = RepairPrice + ReplacementPrice;
+    }
+    #endregion
+
+    private List<string> FilteredDeviceModelOptions => Master.DevicelBrand == "Apple"
+        ? DeviceModelOptions.Where(m => m.StartsWith("iPhone")).ToList()
+        : new List<string>();
     private List<string> DeviceBrandOptions = new List<string>
     {
         "Apple",
         "Samsung"
     };
+    // Options for Device Model
     private List<string> DeviceModelOptions = new List<string>
     {
         "iPhone 11",
@@ -232,14 +326,13 @@ else
         "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Şanlıurfa", "Şırnak", "Siirt",
         "Sinop", "Sivas", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
     };
-
     // Options for Type of Service
     private List<string> TypeOfServiceOptions = new List<string>
     {
         "Repair",
         "Replacement",
+        "Repair And Replacement"
     };
-
     // Options for Service Status
     private List<string> ServiceStatusOptions = new List<string>
     {
@@ -248,27 +341,6 @@ else
         "Completed"
     };
 
-    private List<string> FilteredDeviceModelOptions => Master.DevicelBrand == "Apple"
-        ? DeviceModelOptions.Where(m => m.StartsWith("iPhone")).ToList()
-        : new List<string>();
-
-    private void OnStatusChanged(ChangeEventArgs e)
-    {
-        Master.ServiceStatus = e.Value.ToString();
-
-        // Status "completed" olduğunda tarih seçiciyi gösterir
-        if (Master.ServiceStatus == "Completed")
-        {
-            // Tarih seçici görünüyorsa, tarihi bugünün tarihi olarak ayarla
-            // Master.CompletionDate = DateOnly.FromDateTime(DateTime.Today);
-        }
-        else
-        {
-            Master.CompletionDate = DateOnly.MinValue;
-        }
-    }
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see https://aka.ms/RazorPagesCRUD.
     public async Task UpdateMaster()
     {
         using var context = DbFactory.CreateDbContext();
@@ -289,7 +361,7 @@ else
                 throw;
             }
         }
-
+        Master.UsedParts = string.Join(", ", selectedPartsTypes);
         NavigationManager.NavigateTo("/masters");
     }
 
@@ -299,6 +371,7 @@ else
         return context.Master.Any(e => e.id == id);
     }
 }
+
 <style>
     .expandable-list {
         position: relative;
