@@ -1,7 +1,74 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 
-<h1>Hello, world!</h1>
+<h3>Select Device Model and Parts</h3>
 
-Welcome to your new app.
+<select @onchange="OnDeviceModelChanged">
+    <option value="">Select Device Model</option>
+    @foreach (var model in deviceModels)
+    {
+        <option value="@model" selected="@((model == selectedDeviceModel) ? "selected" : null)">@model</option>
+    }
+</select>
+
+@if (spareParts != null && spareParts.Count > 0)
+{
+    <EditForm Model="@selectedParts">
+        @foreach (var part in spareParts)
+        {
+            <InputCheckbox @bind-Value="@part.IsSelected" />
+            <label>@part.PartsType</label>
+
+            <br />
+        }
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </EditForm>
+}
+else
+{
+    <p>No parts found for the selected device.</p>
+}
+
+@code {
+    private string selectedDeviceModel;
+    private List<SparePartsCheckboxModel> spareParts;
+    private List<SparePartsCheckboxModel> selectedParts = new List<SparePartsCheckboxModel>();
+    private List<string> deviceModels = new List<string> { "iPhone 11", "Model2", "Model3" };
+
+    private async Task OnDeviceModelChanged(ChangeEventArgs e)
+    {
+        selectedDeviceModel = e.Value.ToString();
+        await LoadSparePartsAsync();
+    }
+
+    private async Task LoadSparePartsAsync()
+    {
+        if (!string.IsNullOrEmpty(selectedDeviceModel))
+        {
+            spareParts = await DbFactory.CreateDbContext().SpareParts
+                .Where(sp => sp.SparePartsModel == selectedDeviceModel)
+                .Select(sp => new SparePartsCheckboxModel
+                    {
+                        PartsType = sp.PartsType,
+                        IsSelected = false
+                    })
+                .ToListAsync();
+
+            selectedParts = spareParts;
+        }
+        else
+        {
+            spareParts = new List<SparePartsCheckboxModel>();
+            selectedParts = new List<SparePartsCheckboxModel>();
+        }
+    }
+
+    private class SparePartsCheckboxModel
+    {
+        public string PartsType { get; set; }
+        public bool IsSelected { get; set; }
+    }
+}

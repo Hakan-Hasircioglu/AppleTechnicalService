@@ -5,12 +5,15 @@
 @using TechServe.Data
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using System.Text.Json
+@using Blazored.LocalStorage
+
 
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject TechServeContext DbContext
 @inject ProtectedSessionStorage sessionStorage
-
+@inject ProtectedLocalStorage localStorage
+@inject ILocalStorageService localStorage
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>
@@ -23,30 +26,31 @@
             <EditForm method="post" Model="Master" OnValidSubmit="AddMaster" FormName="create" Enhance>
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" />
-                <div class="mb-3">
+                <div class="col-md-6">
                     <label for="costumername" class="form-label">Costumer Name:</label>
                     <InputText id="costumername" @bind-Value="Master.CostumerName" class="form-control" />
                     <ValidationMessage For="() => Master.CostumerName" class="text-danger" />
                 </div>
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <label for="phone" class="form-label">Phone:</label>
                         <InputText id="phone" @bind-Value="Master.Phone" class="form-control" />
                         <ValidationMessage For="() => Master.Phone" class="text-danger" />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-3">
                         <label for="e_mail" class="form-label">E_Mail:</label>
                         <InputText id="e_mail" @bind-Value="Master.E_Mail" class="form-control" />
                         <ValidationMessage For="() => Master.E_Mail" class="text-danger" />
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="adress" class="form-label">Adress:</label>
-                    <InputText id="adress" @bind-Value="Master.Adress" class="form-control" />
-                    <ValidationMessage For="() => Master.Adress" class="text-danger" />
-                </div>
+                    <div class="mb-3">
+                        <label for="adress" class="form-label">Adress:</label>
+                    <textarea id="adress" @bind="Master.Adress" class="form-control" rows="3" style=" height: calc(1.3em * 3);resize: none;"></textarea>
+                        <ValidationMessage For="() => Master.Adress" class="text-danger" />
+                    </div>
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <label for="city" class="form-label">City:</label>
                         <InputSelect id="city" @bind-Value="Master.City" class="form-control">
                             @foreach (var city in CityOptions)
@@ -56,14 +60,15 @@
                         </InputSelect>
                         <ValidationMessage For="() => Master.Adress" class="text-danger" />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-3">
                         <label for="postalcode" class="form-label">Postal Code:</label>
                         <InputText id="postalcode" @bind-Value="Master.PostalCode" class="form-control" />
                         <ValidationMessage For="() => Master.PostalCode" class="text-danger" />
                     </div>
                 </div>
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <label for="devicelbrand" class="form-label">Device Brand:</label>
                         <InputSelect id="devicelbrand" @bind-Value="Master.DevicelBrand" class="form-control" @onchange="OnBrandChanged">
                             @foreach (var brand in DeviceBrandOptions)
@@ -73,102 +78,106 @@
                         </InputSelect>
                         <ValidationMessage For="() => Master.DevicelBrand" class="text-danger" />
                     </div>
-
+                    <div class="col-md-3"></div>
                     @if (Master.DevicelBrand == "Apple")
                     {
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label for="devicelmodel" class="form-label">Device Model:</label>
-                            <InputSelect id="devicelmodel" @bind-Value="Master.DevicelModel" class="form-control">
-                                @foreach (var model in FilteredDeviceModelOptions)
+                            <select @onchange="OnDeviceModelChanged" class="form-control" >
+                                <option value=""></option>
+                                @foreach (var model in DeviceModelOptions)
                                 {
-                                    <option value="@model">@model</option>
+                                    <option value="@model" selected="@((model == selectedDeviceModel) ? "selected" : null)">@model</option>
                                 }
-                            </InputSelect>
-                            <ValidationMessage For="() => Master.DevicelModel" class="text-danger" />
+                            </select>
                         </div>
                     }
                     else
                     {
                         Master.DevicelModel = "";
-                    }
+                    }  
                 </div>
                 <div class="row mb-3">
-
                     <div class="col-md-3">
-                        <label for="servicestatus" class="form-label">Service Status:</label>
-                        <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control">
-                            @foreach (var status in ServiceStatusOptions)
+                            <label for="servicestatus" class="form-label">Service Status:</label>
+                            <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control">
+                                @foreach (var status in ServiceStatusOptions)
+                                {
+                                <option value="@status">@status</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => Master.ServiceStatus" class="text-danger" />
+                    </div>  
+                    <div class="col-md-1"></div>
+                    <div class="col-md-3">
+                        <label for="typeofservice" class="form-label">Type Of Service:</label>
+                        <InputSelect id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control">
+                            @foreach (var status in TypeOfServiceOptions)
                             {
                                 <option value="@status">@status</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="() => Master.ServiceStatus" class="text-danger" />
+                        <ValidationMessage For="() => Master.TypeOfService" class="text-danger" />
                     </div>
+                    <div class="col-md-1"></div>
                     <div class="col-md-3">
-                        <label for="usedparts" class="form-label">Repaired:</label>
-                        <div class="expandable-list">
-                            <button class="btn btn-primary custom-button" @onclick="ToggleList">
-                                    Parts
-                            </button>
+                        @if (spareParts != null && spareParts.Count > 0 && Master.TypeOfService != "")
+                        {
+                                @foreach (var part in spareParts)
+                                {
+                                    <InputCheckbox @bind-Value="@part.IsSelected" />
+                                    <label>@part.PartsType</label>
 
-                            @if (isExpanded)
-                            {
-                                <div class="checkbox-list">
-                                    @foreach (var item in partsTypes)
-                                    {
-                                        var truncatedPartsType = item.PartsType.Length > 16
-                                        ? item.PartsType.Substring(0, 16) + "..."
-                                        : item.PartsType;
-
-                                        <div class="col-md-4">
-                                            <input type="checkbox" id="@truncatedPartsType" value="@truncatedPartsType"
-                                                   @onchange="eventArgs => OnCheckboxChanged(eventArgs, item)"
-                                                   checked="@IsChecked(item)" />
-                                            <label for="@truncatedPartsType">@truncatedPartsType</label>
-                                        </div>
-                                    }
-                                </div>
-                            }
-                        </div>
+                                    <br />
+                                }
+                            <button type="button" class="btn btn-primary" @onclick="CalculatePrice">Calculate Price</button>
+                        }
                     </div>
-
                 </div>
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <label for="servicecode" class="form-label">Service Code:</label>
                         <InputText id="servicecode" @bind-Value="Master.ServiceCode" class="form-control" Readonly />
                         <ValidationMessage For="() => Master.ServiceCode" class="text-danger" />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-3">
                         <label for="price" class="form-label">Price:</label>
                         <InputNumber id="price" @bind-Value="Master.Price" class="form-control" Readonly />
                         <ValidationMessage For="() => Master.Price" class="text-danger" />
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description:</label>
-                    <InputText id="description" @bind-Value="Master.Description" class="form-control" />
-                    <ValidationMessage For="() => Master.Description" class="text-danger" />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                        <label for="description" class="form-label">Description:</label>
+                        <InputText id="description" @bind-Value="Master.Description" class="form-control" />
+                        <ValidationMessage For="() => Master.Description" class="text-danger" />
+                    </div>
                 </div>
                 <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="arrivaldate" class="form-label">Arrival lDate:</label>
+                    <div class="col-md-3">
+                        <label for="arrivaldate" class="form-label">Arrival Date:</label>
                         <InputDate id="arrivaldate" @bind-Value="Master.ArrivalDate" class="form-control" />
                         <ValidationMessage For="() => Master.ArrivalDate" class="text-danger" />
                     </div>
-                   @if(Master.ServiceStatus == "Completed")
-                   {
-                        Master.CompletionDate = DateOnly.FromDateTime(DateTime.Today);
-                        <div class="col-md-6">
-                        <label for="completiondate" class="form-label">Completion Date:</label>
-                        <InputDate id="completiondate" @bind-Value="Master.CompletionDate" class="form-control"/>
-                        <ValidationMessage For="() => Master.CompletionDate" class="text-danger" />
+                    <div class="col-md-3"></div>
+                    <div class="col-md-3">
+                        <div class="form-label">
+                        @if(Master.ServiceStatus == "Completed")
+                        {
+                            Master.CompletionDate = DateOnly.FromDateTime(DateTime.Today);
+
+                                <label for="completiondate" class="form-label">Completion Date:</label>
+                                <InputDate id="completiondate" @bind-Value="Master.CompletionDate" class="form-control"/>
+                                <ValidationMessage For="() => Master.CompletionDate" class="text-danger" />
+
+                        }
+                        else
+                        {
+                           Master.CompletionDate = DateOnly.MinValue;
+                        }
                         </div>
-                    }
-                    else
-                    {
-                       Master.CompletionDate = DateOnly.MinValue;
-                    }
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-edit">Create</button>
             </EditForm>
@@ -190,8 +199,6 @@
     // Options for Device Brand
 
 
-
-
     protected override void OnInitialized()
     {
         Master.City = "";
@@ -209,72 +216,72 @@
     }
 
     #region ChechBox
-    private List<SpareParts> partsTypes;
-    private HashSet<SpareParts> selectedParts = new HashSet<SpareParts>();
-    private bool isExpanded = false;
-    private float RepairPrice;
-    private float ReplacementPrice;
+    private int masterId;
+    private string selectedDeviceModel;
+    private float masterPrice;
+    private List<SparePartsCheckboxModel> spareParts;
+    private List<SparePartsCheckboxModel> selectedParts = new List<SparePartsCheckboxModel>();
 
-    private List<CheckboxItem> items = new List<CheckboxItem>();
-
-    private void ToggleList()
+    private string GetSelectedPartsAsString()
     {
-        isExpanded = !isExpanded;
+        var selectedParts = spareParts
+            .Where(p => p.IsSelected)
+            .Select(p => p.PartsType)
+            .ToList();
+
+        return string.Join(", ", selectedParts);
+    }
+    private async Task OnDeviceModelChanged(ChangeEventArgs e)
+    {
+        selectedDeviceModel = e.Value.ToString();
+        await LoadSparePartsAsync();
     }
 
-    public class CheckboxItem
+    private async Task LoadSparePartsAsync()
     {
-        public string Id { get; set; }
-        public string Text { get; set; }
-        public bool IsChecked { get; set; }
-    }
-    private HashSet<string> selectedPartsTypes = new HashSet<string>();
-
-    private async Task OnCheckboxChanged(ChangeEventArgs e, SpareParts part)
-    {
-        if ((bool)e.Value) // Eğer checkbox işaretlendiyse
+        if (!string.IsNullOrEmpty(selectedDeviceModel))
         {
-            selectedParts.Add(part); // Seçili listeye ekle
-            RepairPrice += part.RepairOfCostOfThePart; // Price'a ekle
+            spareParts = await DbFactory.CreateDbContext().SpareParts
+                .Where(sp => sp.SparePartsModel == selectedDeviceModel)
+                .Select(sp => new SparePartsCheckboxModel
+                    {
+                        PartsType = sp.PartsType,
+                        RepairOfCostOfThePart = sp.RepairOfCostOfThePart,
+                        ReplacementOfCostOfThePart = sp.ReplacementOfCostOfThePart,
+                        SparePrice = sp.SparePrice,
+                        IsSelected = false
+                    })
+                .ToListAsync();
         }
         else
         {
-            selectedParts.Remove(part); // Seçili listeden çıkar
-            RepairPrice -= part.RepairOfCostOfThePart; // Price'tan çıkar
+            spareParts = new List<SparePartsCheckboxModel>();
         }
-        // Checkbox seçim durumunu kaydet
-        await SaveSelectedPartsTypes();
     }
+    private async Task CalculatePrice()
+    {
+        float totalCost = 0;
 
-    private bool IsChecked(SpareParts part)
-    {
-        LoadSelectedPartsTypes();
-        return selectedParts.Contains(part); // part'ı direkt olarak kontrol eder
-    }
-    private async Task SaveSelectedPartsTypes()
-    {
-        // Seçili checkbox durumunu JSON formatında session storage'a kaydet
-        var json = JsonSerializer.Serialize(selectedParts.Select(p => p.PartsType));
-        await sessionStorage.SetAsync("SelectedPartsTypes", json);
-    }
-
-    private async Task LoadSelectedPartsTypes()
-    {
-        var result = await sessionStorage.GetAsync<string>("SelectedPartsTypes");
-        var json = result.Success ? result.Value : null;
-        if (!string.IsNullOrEmpty(json))
+        if (Master.TypeOfService == "Repair")
         {
-            var partsTypesFromStorage = JsonSerializer.Deserialize<List<string>>(json);
-
-            // partsTypes'dan seçili olanları bul
-            selectedParts = partsTypes
-                .Where(p => partsTypesFromStorage.Contains(p.PartsType))
-                .ToHashSet();
-
-            // Price'ı güncelle
-            RepairPrice = selectedParts.Sum(p => p.RepairOfCostOfThePart);
+            totalCost = spareParts.Where(p => p.IsSelected)
+                .Sum(p => p.RepairOfCostOfThePart);
         }
-        Master.Price = RepairPrice + ReplacementPrice;
+        else if (Master.TypeOfService == "Replacement")
+        {
+            totalCost = spareParts.Where(p => p.IsSelected)
+                .Sum(p => p.ReplacementOfCostOfThePart + p.SparePrice);
+        }
+        Master.DevicelModel = selectedDeviceModel;
+        Master.Price = totalCost;
+    }
+    private class SparePartsCheckboxModel
+    {
+        public string PartsType { get; set; }
+        public bool IsSelected { get; set; }
+        public float  RepairOfCostOfThePart { get; set; }
+        public float ReplacementOfCostOfThePart { get; set; }
+        public float SparePrice { get; set; }
     }
     #endregion
 
@@ -322,7 +329,6 @@
     {
         "Repair",
         "Replacement",
-        "Repair And Replacement"
     };
     // Options for Service Status
     private List<string> ServiceStatusOptions = new List<string>
@@ -337,24 +343,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // First Expandable Table
-        partsTypes = await DbContext.SpareParts
-    .Select(sp => new SpareParts { PartsType = sp.PartsType, RepairOfCostOfThePart = sp.RepairOfCostOfThePart })
-    .Distinct()
-    .ToListAsync();
-
-        // Checkbox seçim durumunu yükle (State korumak için)
-        LoadSelectedPartsTypes();
-
         Master.ArrivalDate = DateOnly.FromDateTime(DateTime.Today);
 
-        // En yüksek id'yi al ve sayacı başlat
+        // Service Code
         currentCount = await DbContext.Master
             .OrderByDescending(m => m.id)
             .Select(m => m.id)
             .FirstOrDefaultAsync();
 
-        // Service Code
         int totalLength = 5;
 
         int numberLength = currentCount.ToString().Length;
@@ -371,8 +367,9 @@
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddMaster()
     {
-        Master.UsedParts = string.Join(", ", selectedPartsTypes);
-
+        
+        var usedParts = GetSelectedPartsAsString();
+        Master.UsedParts = usedParts;
         //Create
         using var context = DbFactory.CreateDbContext();
         context.Master.Add(Master);
