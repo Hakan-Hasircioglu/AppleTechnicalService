@@ -1,0 +1,110 @@
+﻿@page "/Staff/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Staff</h4>
+<hr />
+@if (Staff is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Staff" OnValidSubmit="UpdateStaff" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Staff.id" value="@Staff.id" />
+                <div class="mb-3">
+                    <label for="staffusername" class="form-label">StaffUsername:</label>
+                    <InputNumber id="staffusername" @bind-Value="Staff.StaffUsername" class="form-control" />
+                    <ValidationMessage For="() => Staff.StaffUsername" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="passwordhash" class="form-label">PasswordHash:</label>
+                    <InputText id="passwordhash" @bind-Value="Staff.PasswordHash" class="form-control" />
+                    <ValidationMessage For="() => Staff.PasswordHash" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="passwordsimple" class="form-label">PasswordSimple:</label>
+                    <InputNumber id="passwordsimple" @bind-Value="Staff.PasswordSimple" class="form-control" />
+                    <ValidationMessage For="() => Staff.PasswordSimple" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="fullname" class="form-label">FullName:</label>
+                    <InputText id="fullname" @bind-Value="Staff.FullName" class="form-control" />
+                    <ValidationMessage For="() => Staff.FullName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role:</label>
+                    <InputText id="role" @bind-Value="Staff.Role" class="form-control" />
+                    <ValidationMessage For="() => Staff.Role" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/staff">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Staff? Staff { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Staff ??= await context.Staff.FirstOrDefaultAsync(m => m.id == id);
+
+        if (Staff is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateStaff()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Staff!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!StaffExists(Staff!.id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/staff");
+    }
+
+    bool StaffExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Staff.Any(e => e.id == id);
+    }
+}

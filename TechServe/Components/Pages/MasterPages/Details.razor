@@ -74,6 +74,11 @@
                 <dd>@master.ServiceStatus</dd>
             </div>
 
+            <div class="item full-width description">
+                <dt>Used Parts</dt>
+                <dd>@master.UsedParts</dd>
+            </div>
+
             <!-- Yedinci satır -->
             <div class="item full-width description">
                 <dt>Description</dt>
@@ -89,7 +94,7 @@
             </div>
             <div class="item half-width short">
                 <dt>Price</dt>
-                <dd>@master.Price</dd>
+                <dd>@master.Price$</dd>
             </div>
 
             <!-- Sekizinci satır -->
@@ -223,19 +228,12 @@
         height: auto; /* İçerik genişliğine göre yüksekliği ayarla */
     }
 
-    .address {
-        border-bottom: 1px solid #ddd; /* Adres için sınır */
-    }
-
-    .description {
-        border-bottom: 1px solid #ddd; /* Açıklama için sınır */
-    }
 
     .separator {
         width: 100%;
         height: 2px; /* Çizginin kalınlığı */
         background-color: black;
-        margin: 10px 0; /* Çizgi etrafında boşluk */
+        margin: 20px 10px; /* Çizgi etrafında boşluk */
     }
 
     /* Adres ve Açıklama dışındaki öğelerden sınırı kaldır */

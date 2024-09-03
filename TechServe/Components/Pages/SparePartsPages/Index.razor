@@ -5,27 +5,117 @@
 @using TechServe.Model
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Spare Parts</PageTitle>
 
-<h1>Index</h1>
+<h1>Apple Spare Parts</h1>
 
 <p>
-    <a href="spareparts/create">Create New</a>
+    <a href="spareparts/create" class="btn btn-edit">Create New</a>
 </p>
+<div class="table-container">
+    <QuickGrid Class="table table-striped table-hover" Items="DbFactory.CreateDbContext().SpareParts">
+       @*  <PropertyColumn Property="spareparts => spareparts.SparePartsBrand" /> *@
+        <PropertyColumn Property="spareparts => spareparts.SparePartsModel" />
+        <PropertyColumn Property="spareparts => spareparts.PartsType" />
+        <PropertyColumn Property="spareparts => spareparts.AmountOfSpareParts" />
+        <PropertyColumn Property="spareparts => spareparts.Barcode" />
+        <PropertyColumn Property="spareparts => spareparts.SparePrice" />
+        <PropertyColumn Property="spareparts => spareparts.RepairOfCostOfThePart" />
+        <PropertyColumn Property="spareparts => spareparts.ReplacementOfCostOfThePart" />
 
-<QuickGrid Class="table" Items="DbFactory.CreateDbContext().SpareParts">
-    <PropertyColumn Property="spareparts => spareparts.SparePartsBrand" />
-    <PropertyColumn Property="spareparts => spareparts.SparePartsModel" />
-    <PropertyColumn Property="spareparts => spareparts.PartsType" />
-    <PropertyColumn Property="spareparts => spareparts.AmountOfSpareParts" />
-    <PropertyColumn Property="spareparts => spareparts.Barcode" />
-    <PropertyColumn Property="spareparts => spareparts.SparePrice" />
-    <PropertyColumn Property="spareparts => spareparts.RepairOfCostOfThePart" />
-    <PropertyColumn Property="spareparts => spareparts.ReplacementOfCostOfThePart" />
+        <TemplateColumn Context="spareparts">
+            <a href="@($"spareparts/edit?id={spareparts.id}")" class="btn btn-edit btndiff">Edit</a> |
+            <a href="@($"spareparts/details?id={spareparts.id}")" class="btn btn-edit btndiff">Details</a> |
+            <a href="@($"spareparts/delete?id={spareparts.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+<style>
 
-    <TemplateColumn Context="spareparts">
-        <a href="@($"spareparts/edit?id={spareparts.id}")">Edit</a> |
-        <a href="@($"spareparts/details?id={spareparts.id}")">Details</a> |
-        <a href="@($"spareparts/delete?id={spareparts.id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+    /* Add this to your CSS file */
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Ekrandan taşmayı engellemek için yatay kaydırma çubuğu ekler */
+        margin: 20px 0;
+    }
+
+    .table {
+        width: 100%;
+        min-width: 800px; /* Tablo genişliği en az 800px olarak ayarlandı */
+        border-collapse: collapse; /* Tüm çizgileri birleştirir */
+        font-family: Arial, sans-serif;
+        background-color: #ffffff; /* Arka plan beyaz */
+        color: #333; /* Yazı rengi */
+    }
+
+        .table th, .table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #87cefa; /* Açık mavi tonlarında kenarlık */
+            white-space: nowrap; /* Satırların tek satırda kalmasını sağlar */
+        }
+
+        .table th {
+            background-color: #add8e6; /* Başlıklar için açık mavi */
+            font-weight: bold;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #e6f7ff; /* Çift satırlar için açık mavi arka plan */
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #b3e0ff; /* Üzerine gelindiğinde koyu mavi arka plan */
+    }
+
+    .btndiff {
+        padding: 0px 6px;
+        margin: 1px;
+        font-size: 9px;
+    }
+
+    .btndlt {
+        border-color: #ff0f00;
+        color: #ff0f00;
+    }
+
+        .btndlt:hover {
+            background-color: #ff0f00;
+            color: white;
+        }
+</style>

@@ -5,6 +5,8 @@
 @using TechServe.Data
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using System.Text.Json
+@using Blazored.LocalStorage
+
 
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 @inject NavigationManager NavigationManager
@@ -28,19 +30,20 @@ else
             <div class="col-md-8">
                 <EditForm method="post" Model="Master" OnValidSubmit="UpdateMaster" FormName="edit" Enhance>
                     <DataAnnotationsValidator />
-                    <ValidationSummary class="text-danger" />
-                    <div class="mb-3">
-                        <label for="costumername" class="form-label">Costumer Name:</label>
+                    <ValidationSummary />
+                    <input type="hidden" name="Master.id" value="@Master.id" />
+                    <div class="col-md-6">
+                        <label for="costumername" class="form-label">CostumerName:</label>
                         <InputText id="costumername" @bind-Value="Master.CostumerName" class="form-control" />
                         <ValidationMessage For="() => Master.CostumerName" class="text-danger" />
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label for="phone" class="form-label">Phone:</label>
                             <InputText id="phone" @bind-Value="Master.Phone" class="form-control" />
                             <ValidationMessage For="() => Master.Phone" class="text-danger" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="mb-3">
                             <label for="e_mail" class="form-label">E_Mail:</label>
                             <InputText id="e_mail" @bind-Value="Master.E_Mail" class="form-control" />
                             <ValidationMessage For="() => Master.E_Mail" class="text-danger" />
@@ -48,11 +51,11 @@ else
                     </div>
                     <div class="mb-3">
                         <label for="adress" class="form-label">Adress:</label>
-                        <InputText id="adress" @bind-Value="Master.Adress" class="form-control" />
+                        <textarea id="adress" @bind="Master.Adress" class="form-control" rows="3" style=" height: calc(1.3em * 3);resize: none;"></textarea>
                         <ValidationMessage For="() => Master.Adress" class="text-danger" />
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label for="city" class="form-label">City:</label>
                             <InputSelect id="city" @bind-Value="Master.City" class="form-control">
                                 @foreach (var city in CityOptions)
@@ -62,14 +65,15 @@ else
                             </InputSelect>
                             <ValidationMessage For="() => Master.Adress" class="text-danger" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
                             <label for="postalcode" class="form-label">Postal Code:</label>
                             <InputText id="postalcode" @bind-Value="Master.PostalCode" class="form-control" />
                             <ValidationMessage For="() => Master.PostalCode" class="text-danger" />
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label for="devicelbrand" class="form-label">Device Brand:</label>
                             <InputSelect id="devicelbrand" @bind-Value="Master.DevicelBrand" class="form-control" @onchange="OnBrandChanged">
                                 @foreach (var brand in DeviceBrandOptions)
@@ -79,18 +83,17 @@ else
                             </InputSelect>
                             <ValidationMessage For="() => Master.DevicelBrand" class="text-danger" />
                         </div>
-
+                        <div class="col-md-3"></div>
                         @if (Master.DevicelBrand == "Apple")
                         {
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label for="devicelmodel" class="form-label">Device Model:</label>
-                                <InputSelect id="devicelmodel" @bind-Value="Master.DevicelModel" class="form-control">
-                                    @foreach (var model in FilteredDeviceModelOptions)
+                                <select @onchange="OnDeviceModelChanged" class="form-control">
+                                    @foreach (var model in DeviceModelOptions)
                                     {
                                         <option value="@model">@model</option>
                                     }
-                                </InputSelect>
-                                <ValidationMessage For="() => Master.DevicelModel" class="text-danger" />
+                                </select>
                             </div>
                         }
                         else
@@ -99,7 +102,6 @@ else
                         }
                     </div>
                     <div class="row mb-3">
-
                         <div class="col-md-3">
                             <label for="servicestatus" class="form-label">Service Status:</label>
                             <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control">
@@ -109,53 +111,101 @@ else
                                 }
                             </InputSelect>
                             <ValidationMessage For="() => Master.ServiceStatus" class="text-danger" />
-                        </div>                   
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-3">
+                            <label for="typeofservice" class="form-label">Type Of Service:</label>
+                            <InputSelect id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control">
+                                @foreach (var status in TypeOfServiceOptions)
+                                {
+                                    <option value="@status">@status</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => Master.TypeOfService" class="text-danger" />
+                        </div>
+                        <div class="col-md-1"></div>
+
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-12 containerrr">
+
+                            <label for="usedparts" class="used-parts">UsedParts:</label>
+                            <InputText id="usedparts" @bind-Value="Master.UsedParts" class="form-control" Readonly @onclick=ToggleCheckboxList />
+                            <ValidationMessage For="() => Master.UsedParts" class="text-danger" />
+
+
+                            @if (isCheckboxListVisible)
+                            {
+                                <div class="checkbox-list">
+                                    @if (spareParts != null && spareParts.Count > 0 && Master.TypeOfService != "")
+                                    {
+                                        @foreach (var part in spareParts)
+                                        {
+                                            <InputCheckbox @bind-Value="@part.IsSelected" />
+                                            <label>@part.PartsType</label>
+
+                                            <br />
+                                        }
+                                        <button type="button" class="btn btn-primary" @onclick="CalculatePrice">Calculate Price</button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
                             <label for="servicecode" class="form-label">Service Code:</label>
                             <InputText id="servicecode" @bind-Value="Master.ServiceCode" class="form-control" Readonly />
                             <ValidationMessage For="() => Master.ServiceCode" class="text-danger" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
                             <label for="price" class="form-label">Price:</label>
                             <InputNumber id="price" @bind-Value="Master.Price" class="form-control" Readonly />
                             <ValidationMessage For="() => Master.Price" class="text-danger" />
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description:</label>
-                        <InputText id="description" @bind-Value="Master.Description" class="form-control" />
-                        <ValidationMessage For="() => Master.Description" class="text-danger" />
-                    </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="arrivaldate" class="form-label">Arrival lDate:</label>
+                            <label for="description" class="form-label">Description:</label>
+                            <InputText id="description" @bind-Value="Master.Description" class="form-control" />
+                            <ValidationMessage For="() => Master.Description" class="text-danger" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="arrivaldate" class="form-label">Arrival Date:</label>
                             <InputDate id="arrivaldate" @bind-Value="Master.ArrivalDate" class="form-control" />
                             <ValidationMessage For="() => Master.ArrivalDate" class="text-danger" />
                         </div>
-                        @if (Master.ServiceStatus == "Completed")
-                        {
-                            Master.CompletionDate = DateOnly.FromDateTime(DateTime.Today);
-                            <div class="col-md-6">
-                                <label for="completiondate" class="form-label">Completion Date:</label>
-                                <InputDate id="completiondate" @bind-Value="Master.CompletionDate" class="form-control" />
-                                <ValidationMessage For="() => Master.CompletionDate" class="text-danger" />
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
+                            <div class="form-label">
+                                @if (Master.ServiceStatus == "Completed")
+                                {
+                                    Master.CompletionDate = DateOnly.FromDateTime(DateTime.Today);
+
+                                    <label for="completiondate" class="form-label">Completion Date:</label>
+                                    <InputDate id="completiondate" @bind-Value="Master.CompletionDate" class="form-control" />
+                                    <ValidationMessage For="() => Master.CompletionDate" class="text-danger" />
+
+                                }
+                                else
+                                {
+                                    Master.CompletionDate = DateOnly.MinValue;
+                                }
                             </div>
-                        }
-                        else
-                        {
-                            Master.CompletionDate = DateOnly.MinValue;
-                        }
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-edit">Create</button>
+                    <button type="submit" class="btn btn-edit">Save</button>
                 </EditForm>
             </div>
         </div>
     </div>
 }
+
 <div>
-    <a href="/masters">Back to List</a>
+    <a href="/masters" class="btn btn-back">Back to List</a>
 </div>
 
 @code {
@@ -163,30 +213,101 @@ else
     public int id { get; set; }
 
     [SupplyParameterFromForm]
-    public Master Master { get; set; }
+    public Master? Master { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        using var context = DbFactory.CreateDbContext();
-        Master ??= await context.Master.FirstOrDefaultAsync(m => m.id == id);
-
-        if (Master is null)
-        {
-            NavigationManager.NavigateTo("notfound");
-        }
-    }
-    #region ChechBox
-   
-    #endregion
     private void OnBrandChanged(ChangeEventArgs e)
     {
         // Clear the selected model if the brand is changed
         Master.DevicelModel = null;
         StateHasChanged();
     }
+
+    #region ChechBox
+    private int masterId;
+    private string selectedDeviceModel;
+    private float masterPrice;
+    private List<SparePartsCheckboxModel> spareParts;
+    private List<SparePartsCheckboxModel> selectedParts = new List<SparePartsCheckboxModel>();
+    private bool isCheckboxListVisible = false;
+
+    private void ToggleCheckboxList()
+    {
+        if (isCheckboxListVisible == false)
+        {
+            isCheckboxListVisible = true;
+        }
+    }
+
+    private string GetSelectedPartsAsString()
+    {
+        var selectedParts = spareParts
+            .Where(p => p.IsSelected)
+            .Select(p => p.PartsType)
+            .ToList();
+
+        return string.Join(", ", selectedParts);
+    }
+    private async Task OnDeviceModelChanged(ChangeEventArgs e)
+    {
+        selectedDeviceModel = e.Value.ToString();
+        await LoadSparePartsAsync();
+    }
+
+    private async Task LoadSparePartsAsync()
+    {
+        if (!string.IsNullOrEmpty(selectedDeviceModel))
+        {
+            spareParts = await DbFactory.CreateDbContext().SpareParts
+                .Where(sp => sp.SparePartsModel == selectedDeviceModel)
+                .Select(sp => new SparePartsCheckboxModel
+                    {
+                        PartsType = sp.PartsType,
+                        RepairOfCostOfThePart = sp.RepairOfCostOfThePart,
+                        ReplacementOfCostOfThePart = sp.ReplacementOfCostOfThePart,
+                        SparePrice = sp.SparePrice,
+                        IsSelected = false
+                    })
+                .ToListAsync();
+        }
+        else
+        {
+            spareParts = new List<SparePartsCheckboxModel>();
+        }
+    }
+    private async Task CalculatePrice()
+    {
+        float totalCost = 0;
+
+        if (Master.TypeOfService == "Repair")
+        {
+            totalCost = spareParts.Where(p => p.IsSelected)
+                .Sum(p => p.RepairOfCostOfThePart);
+        }
+        else if (Master.TypeOfService == "Replacement")
+        {
+            totalCost = spareParts.Where(p => p.IsSelected)
+                .Sum(p => p.ReplacementOfCostOfThePart + p.SparePrice);
+        }
+        Master.DevicelModel = selectedDeviceModel;
+        Master.Price = totalCost;
+        var usedParts = GetSelectedPartsAsString();
+        Master.UsedParts = usedParts;
+
+        isCheckboxListVisible = false;
+    }
+    private class SparePartsCheckboxModel
+    {
+        public string PartsType { get; set; }
+        public bool IsSelected { get; set; }
+        public float RepairOfCostOfThePart { get; set; }
+        public float ReplacementOfCostOfThePart { get; set; }
+        public float SparePrice { get; set; }
+    }
+    #endregion
+
     private List<string> FilteredDeviceModelOptions => Master.DevicelBrand == "Apple"
-        ? DeviceModelOptions.Where(m => m.StartsWith("iPhone")).ToList()
-        : new List<string>();
+       ? DeviceModelOptions.Where(m => m.StartsWith("iPhone")).ToList()
+       : new List<string>();
     private List<string> DeviceBrandOptions = new List<string>
     {
         "Apple",
@@ -228,7 +349,6 @@ else
     {
         "Repair",
         "Replacement",
-        "Repair And Replacement"
     };
     // Options for Service Status
     private List<string> ServiceStatusOptions = new List<string>
@@ -238,6 +358,23 @@ else
         "Completed"
     };
 
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        using var context = DbFactory.CreateDbContext();
+        Master ??= await context.Master.FirstOrDefaultAsync(m => m.id == id);
+
+        if (Master is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
     public async Task UpdateMaster()
     {
         using var context = DbFactory.CreateDbContext();
@@ -258,7 +395,7 @@ else
                 throw;
             }
         }
-        // Master.UsedParts = string.Join(", ", selectedPartsTypes);
+
         NavigationManager.NavigateTo("/masters");
     }
 
@@ -268,11 +405,46 @@ else
         return context.Master.Any(e => e.id == id);
     }
 }
-
 <style>
-    .expandable-list {
-        position: relative;
-        margin-bottom: 1rem;
+    .container {
+        position: relative; /* Checkbox listesinin bu kapsayıcıya göre konumlandırılmasını sağlar */
+    }
+
+    .used-parts {
+        cursor: pointer;
+        position: relative; /* Doğru konumlandırma için gerekli */
+    }
+
+    .checkbox-list {
+        position: absolute; /* Konumlandırma için */
+        background: white;
+        border: 1px solid #ddd;
+        padding: 5px; /* İçerik etrafındaki boşluk */
+        z-index: 1000; /* Diğer içeriklerin üstünde görünmesini sağlar */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Görsel olarak daha belirgin hale getirir */
+        display: flex; /* Flex düzeni kullanarak tek sütunlu yapıyı sağlar */
+        flex-direction: column; /* Tek sütun düzeni */
+        gap: 5px; /* Öğeler arasındaki boşluk */
+        max-height: 300px; /* Maksimum yükseklik */
+        overflow-y: auto; /* İçerik sığmıyorsa kaydırma çubuğu ekler */
+        width: 300px; /* Genişlik ayarı */
+    }
+
+        .checkbox-list div {
+            display: flex;
+            align-items: center;
+            font-size: 14px; /* Yazı tipi boyutu */
+        }
+
+        .checkbox-list input[type="checkbox"] {
+            width: 16px; /* Checkbox genişliği */
+            height: 16px; /* Checkbox yüksekliği */
+            margin-right: 4px; /* Checkbox ile etiket arasındaki boşluk */
+        }
+
+
+    .btn-primary {
+        margin-top: 10px;
     }
 
     .custom-button {
@@ -286,21 +458,7 @@ else
         position: relative;
     }
 
-    .checkbox-list {
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        width: 500%;
-        background-color: white;
-        border: 1px solid #ddd;
-        z-index: 10;
-        ;
-        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-        transform: translateX(-50%);
-        display: flex;
-        flex-wrap: wrap;
-        padding: 20px;
-    }
+
 
     .form-check {
         flex: 1 0 33%;

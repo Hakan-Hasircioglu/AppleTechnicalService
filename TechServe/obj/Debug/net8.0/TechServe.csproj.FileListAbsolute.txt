@@ -8,6 +8,7 @@ C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\TechServe.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\TechServe.pdb
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Azure.Core.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Azure.Identity.dll
+C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Blazored.LocalStorage.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Humanizer.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Microsoft.AspNetCore.Authorization.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Microsoft.AspNetCore.Components.dll
@@ -73,6 +74,7 @@ C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\NuGet.Packaging
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\NuGet.ProjectModel.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\NuGet.Protocol.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\NuGet.Versioning.dll
+C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Solutaris.InfoWARE.ProtectedBrowserStorage.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\System.CodeDom.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\System.Composition.AttributedModel.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\System.Composition.Convention.dll
@@ -244,6 +246,7 @@ C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.Assem
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.AssemblyInfo.cs
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.csproj.CoreCompileInputs.cache
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.sourcelink.json
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\staticwebassets\msbuild.TechServe.Microsoft.AspNetCore.StaticWebAssets.props
@@ -261,6 +264,3 @@ C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\refint\TechServ
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.pdb
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.genruntimeconfig.cache
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\ref\TechServe.dll
-C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.sourcelink.json
-C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Solutaris.InfoWARE.ProtectedBrowserStorage.dll
-C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Blazored.LocalStorage.dll

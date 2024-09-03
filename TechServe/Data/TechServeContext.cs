@@ -20,5 +20,6 @@ namespace TechServe.Data
         public DbSet<TechServe.Model.DetailsTable> Details { get; set; } = default!;
         public DbSet<TechServe.Model.SpareParts> SpareParts { get; set; } = default!;
         public DbSet<TechServe.Model.BuySpareParts> BuySpareParts { get; set; } = default!;
+        public DbSet<TechServe.Model.Staff> Staff { get; set; } = default!;
     }
 }

@@ -12,8 +12,7 @@
 @inject NavigationManager NavigationManager
 @inject TechServeContext DbContext
 @inject ProtectedSessionStorage sessionStorage
-@inject ProtectedLocalStorage localStorage
-@inject ILocalStorageService localStorage
+
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>
@@ -111,7 +110,7 @@
                     <div class="col-md-1"></div>
                     <div class="col-md-3">
                         <label for="typeofservice" class="form-label">Type Of Service:</label>
-                        <InputSelect id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control">
+                        <InputSelect  id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control">
                             @foreach (var status in TypeOfServiceOptions)
                             {
                                 <option value="@status">@status</option>
@@ -120,17 +119,31 @@
                         <ValidationMessage For="() => Master.TypeOfService" class="text-danger" />
                     </div>
                     <div class="col-md-1"></div>
-                    <div class="col-md-3">
-                        @if (spareParts != null && spareParts.Count > 0 && Master.TypeOfService != "")
-                        {
-                                @foreach (var part in spareParts)
-                                {
-                                    <InputCheckbox @bind-Value="@part.IsSelected" />
-                                    <label>@part.PartsType</label>
+                   
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12 containerrr">
+                        
+                        <label for="usedparts" class="used-parts">UsedParts:</label>
+                        <InputText id="usedparts" @bind-Value="Master.UsedParts" class="form-control" Readonly @onclick=ToggleCheckboxList />
+                        <ValidationMessage For="() => Master.UsedParts" class="text-danger" />
 
-                                    <br />
+                        
+                        @if (isCheckboxListVisible)
+                        {
+                            <div class="checkbox-list">
+                                @if (spareParts != null && spareParts.Count > 0 && Master.TypeOfService != "")
+                                {
+                                    @foreach (var part in spareParts)
+                                    {
+                                        <InputCheckbox @bind-Value="@part.IsSelected" />
+                                        <label>@part.PartsType</label>
+
+                                        <br />
+                                    }
+                                    <button type="button" class="btn btn-primary" @onclick="CalculatePrice">Calculate Price</button>
                                 }
-                            <button type="button" class="btn btn-primary" @onclick="CalculatePrice">Calculate Price</button>
+                            </div>
                         }
                     </div>
                 </div>
@@ -221,6 +234,15 @@
     private float masterPrice;
     private List<SparePartsCheckboxModel> spareParts;
     private List<SparePartsCheckboxModel> selectedParts = new List<SparePartsCheckboxModel>();
+    private bool isCheckboxListVisible = false;
+
+    private void ToggleCheckboxList()
+    {
+        if(isCheckboxListVisible == false)
+        {
+            isCheckboxListVisible = true;
+        }
+    }
 
     private string GetSelectedPartsAsString()
     {
@@ -274,6 +296,10 @@
         }
         Master.DevicelModel = selectedDeviceModel;
         Master.Price = totalCost;
+        var usedParts = GetSelectedPartsAsString();
+        Master.UsedParts = usedParts;
+
+        isCheckboxListVisible = false;
     }
     private class SparePartsCheckboxModel
     {
@@ -367,9 +393,6 @@
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddMaster()
     {
-        
-        var usedParts = GetSelectedPartsAsString();
-        Master.UsedParts = usedParts;
         //Create
         using var context = DbFactory.CreateDbContext();
         context.Master.Add(Master);
@@ -379,11 +402,46 @@
 
 }
 <style>
-    .expandable-list {
-        position: relative;
-        margin-bottom: 1rem;
+    .container {
+        position: relative; /* Checkbox listesinin bu kapsayıcıya göre konumlandırılmasını sağlar */
     }
 
+    .used-parts {
+        cursor: pointer;
+        position: relative; /* Doğru konumlandırma için gerekli */
+    }
+
+    .checkbox-list {
+        position: absolute; /* Konumlandırma için */
+        background: white;
+        border: 1px solid #ddd;
+        padding: 5px; /* İçerik etrafındaki boşluk */
+        z-index: 1000; /* Diğer içeriklerin üstünde görünmesini sağlar */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Görsel olarak daha belirgin hale getirir */
+        display: flex; /* Flex düzeni kullanarak tek sütunlu yapıyı sağlar */
+        flex-direction: column; /* Tek sütun düzeni */
+        gap: 5px; /* Öğeler arasındaki boşluk */
+        max-height: 300px; /* Maksimum yükseklik */
+        overflow-y: auto; /* İçerik sığmıyorsa kaydırma çubuğu ekler */
+        width: 300px; /* Genişlik ayarı */
+    }
+
+        .checkbox-list div {
+            display: flex;
+            align-items: center;
+            font-size: 14px; /* Yazı tipi boyutu */
+        }
+
+        .checkbox-list input[type="checkbox"] {
+            width: 16px; /* Checkbox genişliği */
+            height: 16px; /* Checkbox yüksekliği */
+            margin-right: 4px; /* Checkbox ile etiket arasındaki boşluk */
+        }
+
+
+    .btn-primary {
+        margin-top: 10px;
+    }
     .custom-button {
         height: 20px;
         line-height: 0px;
@@ -395,21 +453,7 @@
         position: relative;
     }
 
-    .checkbox-list {
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        width: 500%; 
-        background-color: white;
-        border: 1px solid #ddd;
-        z-index: 10;
-        ;
-        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-        transform: translateX(-50%); 
-        display: flex; 
-        flex-wrap: wrap;
-        padding: 20px; 
-    }
+
 
     .form-check {
         flex: 1 0 33%; 

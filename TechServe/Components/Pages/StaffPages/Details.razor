@@ -1,0 +1,53 @@
+﻿@page "/staff/details"
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Staff</h4>
+    <hr />
+    @if (staff is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">StaffUsername</dt>
+            <dd class="col-sm-10">@staff.StaffUsername</dd>
+            <dt class="col-sm-2">PasswordSimple</dt>
+            <dd class="col-sm-10">@staff.PasswordSimple</dd>
+            <dt class="col-sm-2">FullName</dt>
+            <dd class="col-sm-10">@staff.FullName</dd>
+            <dt class="col-sm-2">Role</dt>
+            <dd class="col-sm-10">@staff.Role</dd>
+        </dl>
+        <div>
+            <a href="@($"/staff/edit?id={staff.id}")">Edit</a> |
+            <a href="@($"/staff")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Staff? staff;
+
+    [SupplyParameterFromQuery]
+    public int id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        staff = await context.Staff.FirstOrDefaultAsync(m => m.id == id);
+
+        if (staff is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

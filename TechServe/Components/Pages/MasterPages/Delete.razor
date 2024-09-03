@@ -20,65 +20,106 @@
     }
     else {
         <dl class="row">
-            <dt class="col-sm-2">CostumerName</dt>
-            <dd class="col-sm-10">@master.CostumerName</dd>
+            <!-- İlk satır -->
+            <div class="item one-half short">
+                <dt>CustomerName</dt>
+                <dd>@master.CostumerName</dd>
+            </div>
+
+            <div class="item one-half short">
+                <dt>E_Mail</dt>
+                <dd>@master.E_Mail</dd>
+            </div>
+
+            <!-- İkinci satır -->
+            <div class="item one-half short">
+                <dt>Phone</dt>
+                <dd>@master.Phone</dd>
+            </div>
+
+            <!-- Üçüncü satır -->
+            <div class="item full-width address">
+                <dt>Address</dt>
+                <dd>@master.Adress</dd>
+            </div>
+
+            <!-- Dördüncü satır -->
+            <div class="item half-width short">
+                <dt>City</dt>
+                <dd>@master.City</dd>
+            </div>
+            <div class="item half-width short">
+                <dt>PostalCode</dt>
+                <dd>@master.PostalCode</dd>
+            </div>
+
+            <!-- Ayrım çizgisi -->
+            <div class="separator"></div>
+
+            <!-- Beşinci satır -->
+            <div class="item half-width short">
+                <dt>DeviceBrand</dt>
+                <dd>@master.DevicelBrand</dd>
+            </div>
+            <div class="item half-width short">
+                <dt>DeviceModel</dt>
+                <dd>@master.DevicelModel</dd>
+            </div>
+
+            <!-- Altıncı satır -->
+            <div class="item half-width short">
+                <dt>TypeOfService</dt>
+                <dd>@master.TypeOfService</dd>
+            </div>
+            <div class="item half-width short">
+                <dt>ServiceStatus</dt>
+                <dd>@master.ServiceStatus</dd>
+            </div>
+
+            <div class="item full-width description">
+                <dt>Used Parts</dt>
+                <dd>@master.UsedParts</dd>
+            </div>
+
+            <!-- Yedinci satır -->
+            <div class="item full-width description">
+                <dt>Description</dt>
+                <dd>@master.Description</dd>
+            </div>
+
+            <!-- Ayrım çizgisi -->
+            <div class="separator"></div>
+
+            <div class="item half-width short">
+                <dt>ServiceCode</dt>
+                <dd>@master.ServiceCode</dd>
+            </div>
+            <div class="item half-width short">
+                <dt>Price</dt>
+                <dd>@master.Price$</dd>
+            </div>
+
+            <!-- Sekizinci satır -->
+            <div class="item half-width short">
+                <dt>ArrivalDate</dt>
+                <dd>@master.ArrivalDate</dd>
+            </div>
+            <div class="item half-width short">
+
+                <dt>CompletionDate</dt>
+                <dd>
+                    @if (master.CompletionDate == DateOnly.MinValue)
+                    {
+                        <span>Not Completed</span>
+                    }
+                    else
+                    {
+                        <span>@master.CompletionDate.ToString("yyyy-MM-dd")</span>
+                    }
+                </dd>
+            </div>
         </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Phone</dt>
-            <dd class="col-sm-10">@master.Phone</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">E_Mail</dt>
-            <dd class="col-sm-10">@master.E_Mail</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Adress</dt>
-            <dd class="col-sm-10">@master.Adress</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">City</dt>
-            <dd class="col-sm-10">@master.City</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">PostalCode</dt>
-            <dd class="col-sm-10">@master.PostalCode</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">DevicelBrand</dt>
-            <dd class="col-sm-10">@master.DevicelBrand</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">DevicelModel</dt>
-            <dd class="col-sm-10">@master.DevicelModel</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">TypeOfService</dt>
-            <dd class="col-sm-10">@master.TypeOfService</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ServiceStatus</dt>
-            <dd class="col-sm-10">@master.ServiceStatus</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ServiceCode</dt>
-            <dd class="col-sm-10">@master.ServiceCode</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Description</dt>
-            <dd class="col-sm-10">@master.Description</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Price</dt>
-            <dd class="col-sm-10">@master.Price</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ArrivalDate</dt>
-            <dd class="col-sm-10">@master.ArrivalDate</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">CompletionDate</dt>
-            <dd class="col-sm-10">@master.CompletionDate</dd>
-        </dl>
+
         <EditForm method="post" Model="master" OnValidSubmit="DeleteMaster" FormName="delete" Enhance>
             <div>
                 <button type="submit" class="btn btn-edit btndlt" disabled="@(master is null)">Delete</button>

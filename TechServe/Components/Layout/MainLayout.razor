@@ -1,13 +1,19 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
 <div class="page">
+    @if (showNavbar)
+    {
     <div class="sidebar">
         <NavMenu />
     </div>
-
+    }
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <div style="position: fixed; top: 10px; right: 10px; background-color: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <div class="text-right">
+                <p class="mb-0" style="font-weight: bold;">John Doe</p>
+                <p class="mb-0" style="font-size: 0.9rem; color: gray;">Software Engineer</p>
+            </div>
         </div>
 
         <article class="content px-4">
@@ -21,3 +27,46 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code {
+    private bool showNavbar;
+
+    protected override void OnInitialized()
+    {
+        // NavigationManager.LocationChanged olayına abone ol
+        NavigationManager.LocationChanged += OnLocationChanged;
+
+        // İlk yüklemede kontrol et
+        UpdateNavbarVisibility(NavigationManager.Uri);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // Sayfa değişikliğinde kontrol et
+        UpdateNavbarVisibility(e.Location);
+    }
+
+    private void UpdateNavbarVisibility(string url)
+    {
+        // URL'yi kontrol ederek Navbar'ı göster veya gizle
+        var currentPage = new Uri(url).Segments.Last();
+
+        if (currentPage == "masters" || currentPage == "/" || currentPage == "devices" || currentPage == "detailstables" || currentPage == "costumers" || currentPage == "spareparts" || currentPage == "staff")
+        {
+            showNavbar = true;
+        }
+        else
+        {
+            showNavbar = false;
+        }
+
+        // Yeniden render et
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        // Aboneliği kaldır
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

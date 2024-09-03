@@ -2,73 +2,29 @@
 
 @using Microsoft.EntityFrameworkCore
 @using TechServe.Model
+@using TechServe.Components.Helpers
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 
-<h3>Select Device Model and Parts</h3>
+<EditForm Model="@staff" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-<select @onchange="OnDeviceModelChanged">
-    <option value="">Select Device Model</option>
-    @foreach (var model in deviceModels)
-    {
-        <option value="@model" selected="@((model == selectedDeviceModel) ? "selected" : null)">@model</option>
-    }
-</select>
+    <div>
+        <label for="password">Password:</label>
+        <InputNumber id="password" @bind-Value="staff.PasswordSimple" type="password" />
+        <ValidationMessage For="@(() => staff.PasswordSimple)" />
+    </div>
 
-@if (spareParts != null && spareParts.Count > 0)
-{
-    <EditForm Model="@selectedParts">
-        @foreach (var part in spareParts)
-        {
-            <InputCheckbox @bind-Value="@part.IsSelected" />
-            <label>@part.PartsType</label>
-
-            <br />
-        }
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </EditForm>
-}
-else
-{
-    <p>No parts found for the selected device.</p>
-}
+    <button type="submit">Submit</button>
+</EditForm>
 
 @code {
-    private string selectedDeviceModel;
-    private List<SparePartsCheckboxModel> spareParts;
-    private List<SparePartsCheckboxModel> selectedParts = new List<SparePartsCheckboxModel>();
-    private List<string> deviceModels = new List<string> { "iPhone 11", "Model2", "Model3" };
+    private Staff staff = new Staff();
 
-    private async Task OnDeviceModelChanged(ChangeEventArgs e)
+    private void HandleSubmit()
     {
-        selectedDeviceModel = e.Value.ToString();
-        await LoadSparePartsAsync();
-    }
-
-    private async Task LoadSparePartsAsync()
-    {
-        if (!string.IsNullOrEmpty(selectedDeviceModel))
-        {
-            spareParts = await DbFactory.CreateDbContext().SpareParts
-                .Where(sp => sp.SparePartsModel == selectedDeviceModel)
-                .Select(sp => new SparePartsCheckboxModel
-                    {
-                        PartsType = sp.PartsType,
-                        IsSelected = false
-                    })
-                .ToListAsync();
-
-            selectedParts = spareParts;
-        }
-        else
-        {
-            spareParts = new List<SparePartsCheckboxModel>();
-            selectedParts = new List<SparePartsCheckboxModel>();
-        }
-    }
-
-    private class SparePartsCheckboxModel
-    {
-        public string PartsType { get; set; }
-        public bool IsSelected { get; set; }
+        // Şifre sunucu tarafında hashlenir
+        staff.PasswordHash = PasswordHelper.HashPassword(Convert.ToString(staff.PasswordSimple));
+        // Veritabanına kaydedilebilir
     }
 }
