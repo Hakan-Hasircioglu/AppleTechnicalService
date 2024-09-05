@@ -1,30 +1,309 @@
 ﻿@page "/"
-
+@using TechServe.Data
 @using Microsoft.EntityFrameworkCore
 @using TechServe.Model
 @using TechServe.Components.Helpers
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject TechServeContext _context
+@inject NavigationManager Navigation
+@inject IJSRuntime jsRuntime
 
-<EditForm Model="@staff" OnValidSubmit="HandleSubmit">
+
+<EditForm Model="staff" OnValidSubmit="DoubleHandleLogin">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div>
-        <label for="password">Password:</label>
-        <InputNumber id="password" @bind-Value="staff.PasswordSimple" type="password" />
-        <ValidationMessage For="@(() => staff.PasswordSimple)" />
-    </div>
+    <div class="form-container">
+        <h3>Login</h3>
 
-    <button type="submit">Submit</button>
+        <div class="form-group">
+            <label for="username">User Name:</label>
+            <InputText id="username" class="form-control" @bind-Value="username" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <InputText id="password" type="password" class="form-control" @bind-Value="password" />
+        </div>
+
+        <button type="submit" class="btn-primary">Login</button>
+
+        @if(nullUsername)
+        {
+            <div class="text-danger">Login failed. Null User Name</div>
+        }
+        @if (nullPassword)
+        {
+            <div class="text-danger">Login failed. Null Password</div>
+        }
+        @if (wrongUsername)
+        {
+            <div class="text-danger">Login failed. Wrong User Name</div>
+        }
+        @if (wrongPassword)
+        {
+            <div class="text-danger">Login failed. Wrong Password</div>
+        }
+    </div>
 </EditForm>
+
+
 
 @code {
     private Staff staff = new Staff();
+    private LoggedInStaff loggedInStaff = new LoggedInStaff();
 
-    private void HandleSubmit()
+    private bool doTruncateTable;
+    private string password;
+    private string username;
+    private bool nullUsername = false;
+    private bool nullPassword = false;
+    private bool wrongUsername = false;
+    private bool wrongPassword = false;
+    private async Task DoubleHandleLogin()
     {
-        // Şifre sunucu tarafında hashlenir
-        staff.PasswordHash = PasswordHelper.HashPassword(Convert.ToString(staff.PasswordSimple));
-        // Veritabanına kaydedilebilir
+        await HandleLogin();
+        await HandleLogin();
+    }
+    private async Task HandleLogin()
+    {
+        if (username != "" && password != "")
+        {
+            nullUsername = false;
+            nullPassword = false;
+            wrongPassword = false;
+            wrongUsername = false;
+            await _context.TruncateLoggedInStaffTableAsync();
+
+
+            staff.PasswordHash = PasswordHelper.HashPassword(Convert.ToString(staff.PasswordSimple));
+
+            try
+            {
+                staff.PasswordSimple = int.Parse(password);
+                wrongPassword = false;
+            }
+            catch (FormatException)
+            {
+                wrongPassword = true;
+            }
+            catch (OverflowException)
+            {
+                wrongPassword = true;
+            }
+            catch (Exception)
+            {
+                wrongPassword = true;
+            }
+            try
+            {
+                staff.StaffUsername = int.Parse(username);
+                wrongUsername = false;
+            }
+            catch (FormatException)
+            {
+                wrongUsername = true;
+            }
+            catch (OverflowException)
+            {
+                wrongUsername = true;
+            }
+            catch (Exception)
+            {
+                wrongUsername = true;
+            }
+
+            var existingStaff = await _context.Staff
+                .FirstOrDefaultAsync(s => s.StaffUsername == staff.StaffUsername && s.PasswordHash == staff.PasswordHash);
+
+            if (existingStaff != null)
+            {
+                var loggedInStaff = new LoggedInStaff
+                    {
+                        ID = 1,
+                        FullName = existingStaff.FullName,
+                        Role = existingStaff.Role,
+                    };
+                _context.LoggedInStaff.Add(loggedInStaff);
+                await _context.SaveChangesAsync();
+                Navigation.NavigateTo("/loadingpage?source=home");
+            }
+            else
+            {
+                var wrongUsernameStaff = await _context.Staff
+    .FirstOrDefaultAsync(s => s.StaffUsername == staff.StaffUsername);
+                var wrongPasswordStaff = await _context.Staff
+                .FirstOrDefaultAsync(s => s.PasswordHash == staff.PasswordHash);
+                if (wrongPasswordStaff == null)
+                {
+                    wrongPassword = true;
+                }
+                if (wrongUsernameStaff == null)
+                {
+                    wrongUsername = true;
+                }
+            }     
+        }
+        else if (username == "" && password == "")
+        {
+            nullUsername = true;
+            nullPassword = true;
+        }
+        else if (username == "")
+        {
+            nullUsername = true;
+            nullPassword = false;
+        }
+        else if (password == "")
+        {
+            nullUsername = false;
+            nullPassword = true;
+        }
+    }
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // Sayfa değişikliğinde kontrol et
+        UpdateNavbarVisibility(e.Location);
+    }
+
+    private void UpdateNavbarVisibility(string url)
+    {
+        // URL'yi kontrol ederek Navbar'ı göster veya gizle
+        var currentPage = new Uri(url).Segments.Last();
+
+        if (currentPage == "/")
+        {
+            doTruncateTable = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("eval", @"
+                window.disableForwardNavigation = function() {
+                    window.onpopstate = function(event) {
+                        history.go(1);
+                    };
+                };
+
+                // Fonksiyonu hemen çağırın
+                window.disableForwardNavigation();
+            ");
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        password = "";
+        username = "";
+        wrongPassword = false;
+        wrongUsername = false;
+        nullPassword = false;
+        nullUsername = false;
+        UpdateNavbarVisibility(Navigation.Uri);
+        if(doTruncateTable)
+        {
+            await _context.TruncateLoggedInStaffTableAsync();
+
+            doTruncateTable = false;
+        }
+
+        StateHasChanged();
     }
 }
+
+<script>
+
+    window.disableForwardNavigation = function () {
+        window.onpopstate = function (event) {
+            history.go(1);
+        };
+    };
+
+    window.disableForwardNavigation();
+</script>
+
+<style>
+    /* Genel Sayfa Stili */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #0461ae; /* Arka plan rengi */
+        color: #333; /* Metin rengi */
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Form Kapsayıcı */
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        margin-top: 30px;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #f5f5f5; /* Form arka plan rengi */
+        border: 1px solid #c01058; /* Form kenar rengi */
+    }
+
+        /* Başlık */
+        .form-container h3 {
+            text-align: center;
+            color: #38749c; /* Başlık rengi */
+            margin-bottom: 20px;
+        }
+
+    /* Form Grubu */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+        .form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #38749c /* Etiket rengi */
+        }
+
+        .form-group .form-control {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #c01058; /* Giriş alanı kenar rengi */
+            box-sizing: border-box;
+            color: #333; /* Giriş metni rengi */
+        }
+
+            .form-group .form-control:focus {
+                border-color: #0461ae; /* Odak rengi */
+                outline: none;
+                box-shadow: 0 0 0 0.2rem rgba(4, 97, 174, 0.25); /* Odak gölgesi */
+            }
+
+    /* Buton Stili */
+    .btn-primary {
+        color: #0461ae; /* Buton arka plan rengi */
+        background-color: #f5f5f5;
+        border-color: #c01058; /* Buton kenar rengi */
+        font-size: 16px;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+        border: 1px solid #c01058; /* Buton kenar rengi */
+    }
+
+        .btn-primary:hover {
+            background-color: #a00d50; /* Hover arka plan rengi */
+            border-color: #a00d50; /* Hover kenar rengi */
+            color: 
+        }
+
+    /* Hata Mesajı */
+    .text-danger {
+        color: #c01058; /* Hata mesajı rengi */
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    </style>

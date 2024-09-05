@@ -20,8 +20,8 @@
         <PropertyColumn Property="spareparts => spareparts.AmountOfSpareParts" />
         <PropertyColumn Property="spareparts => spareparts.Barcode" />
         <PropertyColumn Property="spareparts => spareparts.SparePrice" />
-        <PropertyColumn Property="spareparts => spareparts.RepairOfCostOfThePart" />
-        <PropertyColumn Property="spareparts => spareparts.ReplacementOfCostOfThePart" />
+@*         <PropertyColumn Property="spareparts => spareparts.RepairOfCostOfThePart" />
+        <PropertyColumn Property="spareparts => spareparts.ReplacementOfCostOfThePart" /> *@
 
         <TemplateColumn Context="spareparts">
             <a href="@($"spareparts/edit?id={spareparts.id}")" class="btn btn-edit btndiff">Edit</a> |
@@ -84,7 +84,7 @@
     }
 
         .table th, .table td {
-            padding: 10px;
+            padding: 5px;
             text-align: left;
             border: 1px solid #87cefa; /* Açık mavi tonlarında kenarlık */
             white-space: nowrap; /* Satırların tek satırda kalmasını sağlar */

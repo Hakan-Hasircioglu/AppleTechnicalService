@@ -10,16 +10,106 @@
 <h1>Devices</h1>
 
 <p>
-    <a href="devices/create">Create New</a>
+    <a href="masters/create" class="btn btn-edit">Add New Model</a>
 </p>
-
-<QuickGrid Class="table" Items="DbFactory.CreateDbContext().Devices">
+<div class="table-container">
+    <QuickGrid Class="table table-striped table-hover"Items="DbFactory.CreateDbContext().Devices">
     <PropertyColumn Property="devices => devices.DevicelBrand" />
     <PropertyColumn Property="devices => devices.DevicelModel" />
 
     <TemplateColumn Context="devices">
-        <a href="@($"devices/edit?id={devices.id}")">Edit</a> |
-        <a href="@($"devices/details?id={devices.id}")">Details</a> |
-        <a href="@($"devices/delete?id={devices.id}")">Delete</a>
+        <a href="@($"masters/edit?id={devices.id}")" class="btn btn-edit btndiff">Edit</a> |
+        <a href="@($"masters/details?id={devices.id}")" class="btn btn-edit btndiff">Details</a> |
+        <a href="@($"masters/delete?id={devices.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
     </TemplateColumn>
 </QuickGrid>
+</div>
+<style>
+
+    /* Add this to your CSS file */
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Ekrandan taşmayı engellemek için yatay kaydırma çubuğu ekler */
+        margin: 20px 0;
+    }
+
+    .table {
+        width: 40%;
+        min-width: 300px; /* Tablo genişliği en az 800px olarak ayarlandı */
+        border-collapse: collapse; /* Tüm çizgileri birleştirir */
+        font-family: Arial, sans-serif;
+        background-color: #ffffff; /* Arka plan beyaz */
+        color: #333; /* Yazı rengi */
+    }
+
+        .table th, .table td {
+            padding: 5px;
+            text-align: left;
+            border: 1px solid #87cefa; /* Açık mavi tonlarında kenarlık */
+            white-space: nowrap; /* Satırların tek satırda kalmasını sağlar */
+        }
+
+        .table th {
+            background-color: #add8e6; /* Başlıklar için açık mavi */
+            font-weight: bold;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #e6f7ff; /* Çift satırlar için açık mavi arka plan */
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #b3e0ff; /* Üzerine gelindiğinde koyu mavi arka plan */
+    }
+
+    .btndiff {
+        padding: 0px 6px;
+        margin: 1px;
+        font-size: 9px;
+    }
+
+    .btndlt {
+        border-color: #ff0f00;
+        color: #ff0f00;
+    }
+
+        .btndlt:hover {
+            background-color: #ff0f00;
+            color: white;
+        }
+</style>

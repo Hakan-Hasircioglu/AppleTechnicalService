@@ -1,0 +1,50 @@
+﻿@page "/loadingpage"
+
+@using TechServe.Data
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@using TechServe.Components.Helpers
+@using Microsoft.AspNetCore.WebUtilities
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject TechServeContext _context
+@inject NavigationManager Navigation
+@inject NavigationManager Navigation
+@inject IJSRuntime jsRuntime
+
+<p>Loading.. Please Wait..</p>
+@code {
+    private string source;
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(Navigation.Uri);
+        var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+        if (queryParameters.TryGetValue("source", out var sourceValue))
+        {
+            source = sourceValue;
+        }
+        await Task.Delay(500);
+        // Değerine göre değişken belirleme
+        if (source == "master")
+        {
+            _context.TruncateLoggedInStaffTableAsync();
+            var currentUri = Navigation.Uri;
+
+            Navigation.NavigateTo("/");
+            RefreshPage();
+        }
+        else if (source == "home")
+        {
+            Navigation.NavigateTo("/masters");
+        }
+    }
+    private void RefreshPage()
+    {
+        // JavaScript fonksiyonunu çağır
+        jsRuntime.InvokeVoidAsync("refreshPage");
+    }
+}
+<script>
+    function refreshPage() {
+        window.location.reload();
+    }
+</script>

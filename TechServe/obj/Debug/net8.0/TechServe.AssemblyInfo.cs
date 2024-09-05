@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TechServe")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+04e0d790af0f5c3cc8f48166de572e2feb342af0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05e455f538b5aba8a845c7402ea6a2caf13dce4c")]
 [assembly: System.Reflection.AssemblyProductAttribute("TechServe")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TechServe")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

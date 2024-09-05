@@ -208,7 +208,7 @@
     [SupplyParameterFromForm]
     public Master Master { get; set; } = new();
     public ServiceCodeCreater ServiceCodeCreater { get; set; } = new();
-
+    public DetailsTable DetailsTable { get; set; } = new();
     // Options for Device Brand
 
 
@@ -370,7 +370,7 @@
     protected override async Task OnInitializedAsync()
     {
         Master.ArrivalDate = DateOnly.FromDateTime(DateTime.Today);
-
+        await Task.Delay(1500);
         // Service Code
         currentCount = await DbContext.Master
             .OrderByDescending(m => m.id)
@@ -396,6 +396,23 @@
         //Create
         using var context = DbFactory.CreateDbContext();
         context.Master.Add(Master);
+        await context.SaveChangesAsync();
+        DateOnly firstdateOnlyValue;
+        DateOnly seconddateOnlyValue;
+        seconddateOnlyValue = Master.CompletionDate;
+        firstdateOnlyValue = Master.ArrivalDate;
+        var newDetailItem  = new DetailsTable
+        {
+            TypeOfService= Master.TypeOfService,
+            ServiceStatus = Master.ServiceStatus,
+            ServiceCode = Master.ServiceCode,
+            Description = Master.Description,
+            PartsUsedForRepair = Master.UsedParts,
+            Price = Master.Price,
+            ArrivalDate = firstdateOnlyValue.ToDateTime(TimeOnly.MinValue),
+            CompletionDate = seconddateOnlyValue.ToDateTime(TimeOnly.MinValue),
+        }; 
+        context.Details.Add(newDetailItem);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/masters");
     }

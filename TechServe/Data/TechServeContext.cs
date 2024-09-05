@@ -21,5 +21,23 @@ namespace TechServe.Data
         public DbSet<TechServe.Model.SpareParts> SpareParts { get; set; } = default!;
         public DbSet<TechServe.Model.BuySpareParts> BuySpareParts { get; set; } = default!;
         public DbSet<TechServe.Model.Staff> Staff { get; set; } = default!;
+        public DbSet<TechServe.Model.LoggedInStaff> LoggedInStaff { get; set; } = default!;
+
+        public async Task TruncateLoggedInStaffTableAsync()
+        {
+            // Ensure to use a database transaction for safety if needed
+            using var transaction = await Database.BeginTransactionAsync();
+
+            try
+            {
+                await Database.ExecuteSqlRawAsync("TRUNCATE TABLE LoggedInStaff");
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 }

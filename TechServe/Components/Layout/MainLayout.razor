@@ -1,5 +1,15 @@
 ﻿@inherits LayoutComponentBase
+
+@using Microsoft.EntityFrameworkCore
+@using TechServe.Model
+@using TechServe.Data
+@using TechServe.Components.Helpers
+
 @inject NavigationManager NavigationManager
+@inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject TechServeContext DbContext
+@inject LoggedInStaff LoggedInStaff
 
 <div class="page">
     @if (showNavbar)
@@ -9,12 +19,16 @@
     </div>
     }
     <main>
-        <div style="position: fixed; top: 10px; right: 10px; background-color: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-            <div class="text-right">
-                <p class="mb-0" style="font-weight: bold;">John Doe</p>
-                <p class="mb-0" style="font-size: 0.9rem; color: gray;">Software Engineer</p>
+        @if (!mainPage)
+        {
+            <div style="position: fixed; top: 10px; right: 10px; background-color: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                <div class="text-right">
+                    <p class="mb-0" style="font-weight: bold;">@fullname</p>
+                    <p class="mb-0" style="font-size: 0.9rem; color: gray;">@role</p>
+                    <button @onclick="GoToHomePage" class="btn btn-edit btndiff btndlt">Log out</button>
+                </div>
             </div>
-        </div>
+        }
 
         <article class="content px-4">
             @Body
@@ -29,7 +43,20 @@
 </div>
 
 @code {
+
     private bool showNavbar;
+    private bool mainPage;
+    private LoggedInStaff loggedInStaff = new LoggedInStaff();
+    private string fullname;
+    private string role;
+    private string currentPage;
+
+    private async Task GoToHomePage()
+    {    
+        await DbContext.TruncateLoggedInStaffTableAsync();
+        NavigationManager.NavigateTo("/loadingpage?source=master");
+        StateHasChanged();
+    }
 
     protected override void OnInitialized()
     {
@@ -43,24 +70,60 @@
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         // Sayfa değişikliğinde kontrol et
+
         UpdateNavbarVisibility(e.Location);
+        WhichPage();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        UpdateNavbarVisibility(NavigationManager.Uri);
+
+        if (currentPage != "/")
+        {
+            var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+
+            if (loggedInStaff != null)
+            {
+                fullname = loggedInStaff.FullName;
+                role = loggedInStaff.Role;
+            }
+        }
     }
 
+    private async Task WhichPage()
+    {
+        if (currentPage != "/")
+        {
+            var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+
+            if (loggedInStaff != null)
+            {
+                fullname = loggedInStaff.FullName;
+                role = loggedInStaff.Role;
+            }
+        }
+    }
     private void UpdateNavbarVisibility(string url)
     {
         // URL'yi kontrol ederek Navbar'ı göster veya gizle
-        var currentPage = new Uri(url).Segments.Last();
+        currentPage = new Uri(url).Segments.Last();
 
-        if (currentPage == "masters" || currentPage == "/" || currentPage == "devices" || currentPage == "detailstables" || currentPage == "costumers" || currentPage == "spareparts" || currentPage == "staff")
+        if (currentPage == "masters" || currentPage == "devices" || currentPage == "detailstables" || currentPage == "costumers" || currentPage == "spareparts" || currentPage == "staff")
         {
             showNavbar = true;
+            mainPage = false;
+        }
+        else if (currentPage == "/" || currentPage == "loadingpage")
+        {
+            showNavbar = false;
+            mainPage = true;
         }
         else
         {
             showNavbar = false;
+            mainPage = false;
         }
 
-        // Yeniden render et
         StateHasChanged();
     }
 
@@ -70,3 +133,56 @@
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }
+
+<style>
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btndiff {
+        padding: 0px 6px;
+        margin: 1px;
+        font-size: 9px;
+    }
+
+    .btndlt {
+        border-color: #ff0f00;
+        color: #ff0f00;
+    }
+
+        .btndlt:hover {
+            background-color: #ff0f00;
+            color: white;
+        }
+</style>
