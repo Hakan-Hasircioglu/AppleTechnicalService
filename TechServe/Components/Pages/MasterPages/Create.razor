@@ -6,7 +6,7 @@
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using System.Text.Json
 @using Blazored.LocalStorage
-
+@using BlazorInputMask
 
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 @inject NavigationManager NavigationManager
@@ -14,7 +14,12 @@
 @inject ProtectedSessionStorage sessionStorage
 
 <PageTitle>Create</PageTitle>
-
+@if(isLoading)
+{
+    <p>Page is Loading.. Please Wait..</p>
+}
+else
+{
 <h1>Create</h1>
 
 <h4>Master</h4>
@@ -31,13 +36,13 @@
                     <ValidationMessage For="() => Master.CostumerName" class="text-danger" />
                 </div>
                 <div class="row mb-3">
-                    <div class="col-md-3">
-                        <label for="phone" class="form-label">Phone:</label>
-                        <InputText id="phone" @bind-Value="Master.Phone" class="form-control" />
-                        <ValidationMessage For="() => Master.Phone" class="text-danger" />
-                    </div>
-                    <div class="col-md-3"></div>
-                    <div class="col-md-3">
+                        <div class="col-md-2">
+                            <label for="phone" class="form-label">Phone:</label>
+                            <InputText id="phone" @bind-Value="Master.Phone" class="form-control" placeholder="(555)" />
+                            <ValidationMessage For="() => Master.Phone" class="text-danger" />
+                        </div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
                         <label for="e_mail" class="form-label">E_Mail:</label>
                         <InputText id="e_mail" @bind-Value="Master.E_Mail" class="form-control" />
                         <ValidationMessage For="() => Master.E_Mail" class="text-danger" />
@@ -82,8 +87,8 @@
                     {
                         <div class="col-md-3">
                             <label for="devicelmodel" class="form-label">Device Model:</label>
-                            <select @onchange="OnDeviceModelChanged" class="form-control" >
-                                <option value=""></option>
+                            <select @onchange="OnDeviceModelChanged" class="form-control">
+                                <option value="Choose Model">Choose Model:</option>
                                 @foreach (var model in DeviceModelOptions)
                                 {
                                     <option value="@model" selected="@((model == selectedDeviceModel) ? "selected" : null)">@model</option>
@@ -99,7 +104,7 @@
                 <div class="row mb-3">
                     <div class="col-md-3">
                             <label for="servicestatus" class="form-label">Service Status:</label>
-                            <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control">
+                        <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control" @onclick="CalculatePrice">
                                 @foreach (var status in ServiceStatusOptions)
                                 {
                                 <option value="@status">@status</option>
@@ -110,7 +115,7 @@
                     <div class="col-md-1"></div>
                     <div class="col-md-3">
                         <label for="typeofservice" class="form-label">Type Of Service:</label>
-                        <InputSelect  id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control">
+                        <InputSelect id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control" @onclick="CalculatePrice">
                             @foreach (var status in TypeOfServiceOptions)
                             {
                                 <option value="@status">@status</option>
@@ -122,30 +127,33 @@
                    
                 </div>
                 <div class="row mb-3">
-                    <div class="col-md-12 containerrr">
-                        
-                        <label for="usedparts" class="used-parts">UsedParts:</label>
-                        <InputText id="usedparts" @bind-Value="Master.UsedParts" class="form-control" Readonly @onclick=ToggleCheckboxList />
-                        <ValidationMessage For="() => Master.UsedParts" class="text-danger" />
+                    @if(isActiveUsedPartsBar)
+                    {
+                        <div class="col-md-12 containerrr">
 
-                        
-                        @if (isCheckboxListVisible)
-                        {
-                            <div class="checkbox-list">
-                                @if (spareParts != null && spareParts.Count > 0 && Master.TypeOfService != "")
-                                {
-                                    @foreach (var part in spareParts)
+                            <label for="usedparts" class="used-parts">UsedParts:</label>
+                            <InputText id="usedparts" @bind-Value="Master.UsedParts" class="form-control" Readonly @onclick=ToggleCheckboxList />
+                            <ValidationMessage For="() => Master.UsedParts" class="text-danger" />
+
+
+                            @if (isCheckboxListVisible)
+                            {
+                                <div class="checkbox-list">
+                                    @if (spareParts != null && spareParts.Count > 0 && Master.TypeOfService != "")
                                     {
-                                        <InputCheckbox @bind-Value="@part.IsSelected" />
-                                        <label>@part.PartsType</label>
+                                        @foreach (var part in spareParts)
+                                        {
+                                            <InputCheckbox @bind-Value="@part.IsSelected" />
+                                            <label>@part.PartsType</label>
 
-                                        <br />
+                                            <br />
+                                        }
+                                        <button type="button" class="btn btn-primary" @onclick="CalculatePrice">Calculate Price</button>
                                     }
-                                    <button type="button" class="btn btn-primary" @onclick="CalculatePrice">Calculate Price</button>
-                                }
-                            </div>
-                        }
-                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-3">
@@ -202,15 +210,16 @@
 <div>
     <a href="/masters" class="btn btn-back">Back to List</a>
 </div>
-
+}
 @code {
 
     [SupplyParameterFromForm]
     public Master Master { get; set; } = new();
     public ServiceCodeCreater ServiceCodeCreater { get; set; } = new();
     public DetailsTable DetailsTable { get; set; } = new();
+    public Costumers Costumers { get; set; } = new();
     // Options for Device Brand
-
+    private bool isLoading = true;
 
     protected override void OnInitialized()
     {
@@ -235,28 +244,44 @@
     private List<SparePartsCheckboxModel> spareParts;
     private List<SparePartsCheckboxModel> selectedParts = new List<SparePartsCheckboxModel>();
     private bool isCheckboxListVisible = false;
+    private bool isActiveUsedPartsBar = false;
 
     private void ToggleCheckboxList()
-    {
-        if(isCheckboxListVisible == false)
+    {       
+        if(!isCheckboxListVisible)
         {
             isCheckboxListVisible = true;
+        }
+        else if (isCheckboxListVisible)
+        {
+            CalculatePrice();
         }
     }
 
     private string GetSelectedPartsAsString()
     {
-        var selectedParts = spareParts
-            .Where(p => p.IsSelected)
-            .Select(p => p.PartsType)
-            .ToList();
+        if (spareParts != null)
+        {
+            var selectedParts = spareParts
+                .Where(p => p.IsSelected)
+                .Select(p => p.PartsType)
+                .ToList();
 
-        return string.Join(", ", selectedParts);
+            return string.Join(" - ", selectedParts);
+        }
+        return string.Empty;
     }
     private async Task OnDeviceModelChanged(ChangeEventArgs e)
     {
         selectedDeviceModel = e.Value.ToString();
+        Master.ServiceStatus = null;
+        Master.TypeOfService = null;
+        CalculatePrice();
+        Master.UsedParts= null;
+        Master.Price = 0; 
+
         await LoadSparePartsAsync();
+        // CalculatePrice();
     }
 
     private async Task LoadSparePartsAsync()
@@ -273,11 +298,13 @@
                         SparePrice = sp.SparePrice,
                         IsSelected = false
                     })
-                .ToListAsync();
+            .ToListAsync();
+            isActiveUsedPartsBar = true;
         }
         else
         {
             spareParts = new List<SparePartsCheckboxModel>();
+            isActiveUsedPartsBar = false;
         }
     }
     private async Task CalculatePrice()
@@ -296,6 +323,7 @@
         }
         Master.DevicelModel = selectedDeviceModel;
         Master.Price = totalCost;
+
         var usedParts = GetSelectedPartsAsString();
         Master.UsedParts = usedParts;
 
@@ -311,6 +339,7 @@
     }
     #endregion
 
+    #region Lists
     private List<string> FilteredDeviceModelOptions => Master.DevicelBrand == "Apple"
         ? DeviceModelOptions.Where(m => m.StartsWith("iPhone")).ToList()
         : new List<string>();
@@ -363,6 +392,7 @@
         "In Progress",
         "Completed"
     };
+    #endregion
 
     // Service Code Zerofill + id num
     private int currentCount;
@@ -370,13 +400,14 @@
     protected override async Task OnInitializedAsync()
     {
         Master.ArrivalDate = DateOnly.FromDateTime(DateTime.Today);
-        await Task.Delay(1500);
+        await Task.Delay(500);
         // Service Code
         currentCount = await DbContext.Master
             .OrderByDescending(m => m.id)
             .Select(m => m.id)
             .FirstOrDefaultAsync();
-
+        await Task.Delay(500);
+        isLoading = false;
         int totalLength = 5;
 
         int numberLength = currentCount.ToString().Length;
@@ -413,6 +444,17 @@
             CompletionDate = seconddateOnlyValue.ToDateTime(TimeOnly.MinValue),
         }; 
         context.Details.Add(newDetailItem);
+        await context.SaveChangesAsync();
+        var newCostumerItem = new Costumers
+            {
+                CostumerName = Master.CostumerName,
+                Phone = Master.Phone,
+                E_Mail = Master.E_Mail,
+                Adress = Master.Adress,
+                City = Master.City,
+                PostalCode = Master.PostalCode,
+            };
+        context.Costumers.Add(newCostumerItem);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/masters");
     }

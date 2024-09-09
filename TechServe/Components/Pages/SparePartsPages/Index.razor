@@ -1,37 +1,156 @@
 ﻿@page "/spareparts"
 
+
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using TechServe.Model
+@using TechServe.Data
+@using Services
+@using TechServe.Components.Helpers
+
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
-
+@inject TechServeContext DbContext
+@inject NavigationManager NavigationManager
+@inject NavigationManager NavigationManager
+@inject LoggedInStaff LoggedInStaff
+@inject RoleService RoleService
 <PageTitle>Spare Parts</PageTitle>
+@if (isLoading)
+{
+    <div class="spinner">Loading...</div>
+}
+else
+{
+    <h1>Spare Parts</h1>
+    @if (RoleService.Role == "Manager")
+    {
+        <a href="spareparts/create" class="btn btn-edit">Add New Device</a>
+    }
+    @if (RoleService.Role == "Admin")
+    {
+        <a href="spareparts/create" class="btn btn-edit">Add New Device</a>
+    }
+    @if (RoleService.Role == "Staff")
+    {
+        <p style="margin-bottom:85px;"></p>
+    }
+    @if (RoleService.Role == "Supervisor")
+    {
+        <p style="margin-bottom:85px;"></p>
+    }
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Customer Name</th>
+                <th>Phone</th>
+                <th>E-Mail</th>
+                <th>City</th>
+                <th>Adress</th>
+                <th>Service Code</th>
+                <th>Repair Cost Of The Part</th>
+                <th>Replacement Cost Of The Part</th>
+                <th>Controll</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var spareParts in filteredMasters)
+            {
+                <tr>
+                    <td>@spareParts.SparePartsBrand</td>
+                    <td>@spareParts.SparePartsModel</td>
+                    <td>@spareParts.PartsType</td>
+                    <td>@spareParts.AmountOfSpareParts</td>
+                    <td>@spareParts.Barcode</td>
+                    <td>@spareParts.SparePrice</td>
+                    <td>@spareParts.RepairOfCostOfThePart</td>
+                    <td>@spareParts.ReplacementOfCostOfThePart</td>
 
-<h1>Apple Spare Parts</h1>
+                    <td>
+                        @if (RoleService.Role == "Manager")
+                        {
+                            <a href="@($"spareParts/edit?id={spareParts.id}")" class="btn btn-edit btndiff">Edit</a>
+                        } 
+                        @if (RoleService.Role == "Admin")
+                        {
+                            <a href="@($"spareParts/edit?id={spareParts.id}")" class="btn btn-edit btndiff">Edit</a>
+                        } |
+                        <a href="@($"spareParts/details?id={spareParts.id}")" class="btn btn-edit btndiff">Details</a> |
+                        @if (RoleService.Role == "Manager")
+                        {
+                            <a href="@($"spareParts/delete?id={spareParts.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
+                        }
+                        @if (RoleService.Role == "Admin")
+                        {
+                            <a href="@($"spareParts/delete?id={spareParts.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
-<p>
-    <a href="spareparts/create" class="btn btn-edit">Create New</a>
-</p>
-<div class="table-container">
-    <QuickGrid Class="table table-striped table-hover" Items="DbFactory.CreateDbContext().SpareParts">
-       @*  <PropertyColumn Property="spareparts => spareparts.SparePartsBrand" /> *@
-        <PropertyColumn Property="spareparts => spareparts.SparePartsModel" />
-        <PropertyColumn Property="spareparts => spareparts.PartsType" />
-        <PropertyColumn Property="spareparts => spareparts.AmountOfSpareParts" />
-        <PropertyColumn Property="spareparts => spareparts.Barcode" />
-        <PropertyColumn Property="spareparts => spareparts.SparePrice" />
-@*         <PropertyColumn Property="spareparts => spareparts.RepairOfCostOfThePart" />
-        <PropertyColumn Property="spareparts => spareparts.ReplacementOfCostOfThePart" /> *@
+@code {
+    TechServeContext context = default!;
 
-        <TemplateColumn Context="spareparts">
-            <a href="@($"spareparts/edit?id={spareparts.id}")" class="btn btn-edit btndiff">Edit</a> |
-            <a href="@($"spareparts/details?id={spareparts.id}")" class="btn btn-edit btndiff">Details</a> |
-            <a href="@($"spareparts/delete?id={spareparts.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
-        </TemplateColumn>
-    </QuickGrid>
-</div>
+    private Master master { get; set; }
+    private SpareParts spareParts { get; set; }
+    private IEnumerable<SpareParts> allMasters;
+    private IEnumerable<SpareParts> filteredMasters;
+    private string BarcodeSearch = string.Empty;
+
+    private bool isLoading = true;
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+
+        allMasters = DbFactory.CreateDbContext().SpareParts;
+        // Başlangıçta tüm verileri göster
+        filteredMasters = allMasters;
+    }
+    protected override async Task OnInitializedAsync()
+    {       
+        await Task.Delay(250);
+        isLoading = false;
+        var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+        if (loggedInStaff != null)
+        {
+            RoleService.UpdateSharedData($"{loggedInStaff.Role}");
+        }
+    }
+    private void OnBarcodeChangedHandler(ChangeEventArgs e)
+    {
+        BarcodeSearch = e.Value.ToString();
+        FilterData();
+    }
+    private void FilterData()
+    {
+        filteredMasters = allMasters
+         .Where(spareParts => (string.IsNullOrEmpty(BarcodeSearch) || spareParts.Barcode.ToString().Contains(BarcodeSearch)));
+    }
+}
+
 <style>
 
+    .filter-section {
+        border: 2px solid #0461ae; /* Çevresine mavi bir sınır ekleyelim */
+        border-radius: 4px; /* Köşeleri yuvarlak yapalım */
+        padding: 5px; /* İçeriğin kenarlardan uzak durması için padding ekleyelim */
+        background-color: #f5f5f5; /* Arka plan rengini açık gri yapalım */
+        margin-bottom: 5px; /* Filtreleme alanı ile aşağıdaki içerik arasında boşluk bırakalım */
+    }
+    /* Sağda sabit konumlandırılmış select */
+    .select-container {
+        display: flex;
+        justify-content: flex-end; /* Sağ tarafa hizala */
+        padding: 10px; /* İç boşluk */
+        background-color: #edd7d3; /* Arka plan rengini hafif gri yap */
+    }
+
+        .select-container select {
+            width: auto; /* Genişliği otomatik ayarla */
+            max-width: 200px; /* Maksimum genişlik ayarla */
+        }
     /* Add this to your CSS file */
     .btn {
         display: inline-block;
@@ -49,8 +168,8 @@
     }
 
     .btn-edit {
-        border-color: #007bff; /* Blue border */
-        color: #007bff; /* Blue text */
+        border-color: #0461ae; /* Blue border */
+        color: #0461ae; /* Blue text */
     }
 
         .btn-edit:hover {
@@ -76,7 +195,7 @@
 
     .table {
         width: 100%;
-        min-width: 800px; /* Tablo genişliği en az 800px olarak ayarlandı */
+        min-width: 400px; /* Tablo genişliği en az 800px olarak ayarlandı */
         border-collapse: collapse; /* Tüm çizgileri birleştirir */
         font-family: Arial, sans-serif;
         background-color: #ffffff; /* Arka plan beyaz */
@@ -86,7 +205,7 @@
         .table th, .table td {
             padding: 5px;
             text-align: left;
-            border: 1px solid #87cefa; /* Açık mavi tonlarında kenarlık */
+            border: 1px solid #0461ae; /* Açık mavi tonlarında kenarlık */
             white-space: nowrap; /* Satırların tek satırda kalmasını sağlar */
         }
 

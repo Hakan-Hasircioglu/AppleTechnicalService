@@ -1,24 +1,35 @@
 ﻿@page "/masters/details"
 
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
 @using TechServe.Model
+@using TechServe.Data
+@using Services
+@using TechServe.Components.Helpers
+
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 @inject NavigationManager NavigationManager
+@inject LoggedInStaff LoggedInStaff
+@inject TechServeContext DbContext
+@inject RoleService RoleService
+@inject IJSRuntime JS
 
 <PageTitle>Details</PageTitle>
 
 <h1>Details</h1>
 
 <div>
-    <h4>Tecnical Service Form</h4>
+   
     <hr />
     @if (master is null)
     {
         <p><em>Loading...</em></p>
     }
-    else {
-        <dl class="row">
-            <!-- İlk satır -->
+    else
+    {
+        
+        <dl id="printableArea" class="row">
+            <h4>Tecnical Service Form</h4>
             <div class="item one-half short">
                 <dt>CustomerName</dt>
                 <dd>@master.CostumerName</dd>
@@ -118,13 +129,15 @@
             </div>
         </dl>
 
-
+        @if(RoleService.Role != "Staff")
+        {
         <div>
             <a href="@($"/masters/edit?id={master.id}")" class="btn btn-edit">Edit</a>
         </div>
-
+        }
         <div>
             <a href="@($"/masters")" class="btn btn-back">Back to List</a>
+            <button class="btn btn-edit" @onclick="PrintForm">Print Form</button>
         </div>
 
 
@@ -133,12 +146,21 @@
 
 @code {
     Master? master;
-
     [SupplyParameterFromQuery]
     public int id { get; set; }
+    [CascadingParameter]
+    public string SharedData { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        await Task.Delay(500);
+
+        var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+        if (loggedInStaff != null)
+        {
+            RoleService.UpdateSharedData($"{loggedInStaff.Role}");
+        }
+        await Task.Delay(500);
         using var context = DbFactory.CreateDbContext();
         master = await context.Master.FirstOrDefaultAsync(m => m.id == id);
 
@@ -147,7 +169,27 @@
             NavigationManager.NavigateTo("notfound");
         }
     }
+    private async Task PrintForm()
+    {
+        await JS.InvokeVoidAsync("printSpecificArea", "#printableArea");
+    }
 }
+
+<script>
+    function printSpecificArea(selector) {
+        var printContents = document.querySelector(selector).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+    }
+</script>
+
+
+
+
 <style>
     /* Add this to your CSS file */
     .btn {

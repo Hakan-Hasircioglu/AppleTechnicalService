@@ -52,8 +52,8 @@
             <dd class="col-sm-10">@spareparts.ReplacementOfCostOfThePart</dd>
         </dl>
         <EditForm method="post" Model="spareparts" OnValidSubmit="DeleteSpareParts" FormName="delete" Enhance>
-            <button type="submit" class="btn btn-danger" disabled="@(spareparts is null)">Delete</button> |
-            <a href="/spareparts">Back to List</a>
+            <button type="submit" class="btn btn-edit btndlt" disabled="@(spareparts is null)">Delete</button> |
+            <a href="/spareparts" class="btn btn-edit btn-back">Back to List</a>
         </EditForm>
     }
 </div>
@@ -83,3 +83,49 @@
         NavigationManager.NavigateTo("/spareparts");
     }
 }
+<style>
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btndlt {
+        border-color: #ff0f00;
+        color: #ff0f00;
+    }
+
+        .btndlt:hover {
+            background-color: #ff0f00;
+            color: white;
+        }
+</style>

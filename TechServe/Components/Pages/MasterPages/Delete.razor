@@ -147,12 +147,51 @@
             NavigationManager.NavigateTo("notfound");
         }
     }
+    private async Task DeleteStaff()
+    {
 
+    }
     public async Task DeleteMaster()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Master.Remove(master!);
-        await context.SaveChangesAsync();
+        try
+        {
+            using var _context = DbFactory.CreateDbContext();
+
+            // Master tablosundan sil
+            var masterEntry = await _context.Master
+                .FirstOrDefaultAsync(m => m.id == master.id);
+            if (masterEntry != null)
+            {
+                _context.Master.Remove(masterEntry);
+            }
+
+            // Costumers tablosundan sil
+            var costumerEntry = await _context.Costumers
+                .FirstOrDefaultAsync(c => c.id == master.id);
+            if (costumerEntry != null)
+            {
+                _context.Costumers.Remove(costumerEntry);
+            }
+
+            // Details tablosundan sil
+            var detailsEntry = await _context.Details
+                .FirstOrDefaultAsync(d => d.id == master.id);
+            if (detailsEntry != null)
+            {
+                _context.Details.Remove(detailsEntry);
+            }
+
+            // Değişiklikleri kaydet
+            await _context.SaveChangesAsync();
+
+            // Başarı mesajı veya yönlendirme yapılabilir
+        }
+        catch (Exception ex)
+        {
+            // Hata yönetimi
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+        await Task.Delay(150);
         NavigationManager.NavigateTo("/masters");
     }
 }

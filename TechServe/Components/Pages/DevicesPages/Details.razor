@@ -1,9 +1,18 @@
 ﻿@page "/devices/details"
 
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
 @using TechServe.Model
+@using TechServe.Data
+@using Services
+@using TechServe.Components.Helpers
+
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 @inject NavigationManager NavigationManager
+@inject LoggedInStaff LoggedInStaff
+@inject TechServeContext DbContext
+@inject RoleService RoleService
+@inject IJSRuntime JS
 
 <PageTitle>Details</PageTitle>
 
@@ -24,8 +33,12 @@
             <dd class="col-sm-10">@devices.DevicelModel</dd>
         </dl>
         <div>
-            <a href="@($"/devices/edit?id={devices.id}")">Edit</a> |
-            <a href="@($"/devices")">Back to List</a>
+            @if (RoleService.Role != "Staff")
+            {
+                <a href="@($"/devices/edit?id={devices.id}")" class="btn btn-back">Edit</a>
+            }
+            |
+            <a href="@($"/devices")" class="btn btn-edit">Back to List</a>
         </div>
     }
 </div>
@@ -38,12 +51,109 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await Task.Delay(500);
+
+        var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+        if (loggedInStaff != null)
+        {
+            RoleService.UpdateSharedData($"{loggedInStaff.Role}");
+        }
+        await Task.Delay(500);
         using var context = DbFactory.CreateDbContext();
         devices = await context.Devices.FirstOrDefaultAsync(m => m.id == id);
-
-        if (devices is null)
-        {
-            NavigationManager.NavigateTo("notfound");
-        }
     }
 }
+<style>
+    /* Add this to your CSS file */
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 auto; /* Ortalamak için margin auto ekleyin */
+        max-width: 1200px; /* Maksimum genişliği belirleyin (isteğe bağlı) */
+        padding: 20px; /* Sağdan ve soldan boşluk ekleyin */
+        box-sizing: border-box;
+    }
+
+    .item {
+        box-sizing: border-box;
+        padding: 10px;
+        border-bottom: 1px solid transparent; /* Şu an gri çizgi yerine şeffaf çizgi */
+    }
+
+    .short {
+        height: 50px; /* Kısa satırlar için yükseklik */
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    .half-width {
+        width: 50%;
+    }
+
+    .one-half {
+        width: 50%;
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .one-third {
+        width: 33.33%;
+    }
+
+    .address,
+    .description {
+        height: auto; /* İçerik genişliğine göre yüksekliği ayarla */
+    }
+
+
+    .separator {
+        width: 100%;
+        height: 2px; /* Çizginin kalınlığı */
+        background-color: black;
+        margin: 20px 10px; /* Çizgi etrafında boşluk */
+    }
+
+    /* Adres ve Açıklama dışındaki öğelerden sınırı kaldır */
+    .item:not(.address):not(.description) {
+        border-bottom: 0; /* Alt sınırı kaldır */
+    }
+
+</style>

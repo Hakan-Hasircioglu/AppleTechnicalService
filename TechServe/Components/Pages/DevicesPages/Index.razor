@@ -3,27 +3,74 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using TechServe.Model
+@using TechServe.Data
+@using Services
+@using TechServe.Components.Helpers
+
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject TechServeContext DbContext
+@inject NavigationManager NavigationManager
+@inject NavigationManager NavigationManager
+@inject LoggedInStaff LoggedInStaff
+@inject RoleService RoleService
 
 <PageTitle>Devices</PageTitle>
 
 <h1>Devices</h1>
+@if (isLoading)
+{
+    <div class="spinner">Loading...</div>
+}
+else
+{
+    @if (RoleService.Role != "Staff")
+    {
+        <a href="devices/create" class="btn btn-edit">Add New Device</a>
+    }
+    else
+    {
+        <p style="margin-bottom:85px;"></p>
+    }
+    <div class="table-container">
+        <QuickGrid Class="table table-striped table-hover"Items="DbFactory.CreateDbContext().Devices">
+            <PropertyColumn Property="devices => devices.DevicelBrand" Title="Device Brand"/>
+            <PropertyColumn Property="devices => devices.DevicelModel" Title="Device Model" />
 
-<p>
-    <a href="masters/create" class="btn btn-edit">Add New Model</a>
-</p>
-<div class="table-container">
-    <QuickGrid Class="table table-striped table-hover"Items="DbFactory.CreateDbContext().Devices">
-    <PropertyColumn Property="devices => devices.DevicelBrand" />
-    <PropertyColumn Property="devices => devices.DevicelModel" />
-
-    <TemplateColumn Context="devices">
-        <a href="@($"masters/edit?id={devices.id}")" class="btn btn-edit btndiff">Edit</a> |
-        <a href="@($"masters/details?id={devices.id}")" class="btn btn-edit btndiff">Details</a> |
-        <a href="@($"masters/delete?id={devices.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
-</div>
+            <TemplateColumn Context="devices" Title="Controlls">
+                @if (RoleService.Role == "Manager")
+                {
+                    <a href="@($"spareParts/edit?id={devices.id}")" class="btn btn-edit btndiff">Edit</a>
+                }
+                @if (RoleService.Role == "Admin")
+                {
+                    <a href="@($"spareParts/edit?id={devices.id}")" class="btn btn-edit btndiff">Edit</a>
+                } |
+                <a href="@($"spareParts/details?id={devices.id}")" class="btn btn-edit btndiff">Details</a> |
+                @if (RoleService.Role == "Manager")
+                {
+                    <a href="@($"spareParts/delete?id={devices.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
+                }
+                @if (RoleService.Role == "Admin")
+                {
+                    <a href="@($"spareParts/delete?id={devices.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
+                }
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+}
+@code {
+    private bool isLoading = true;
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(200);
+        isLoading = false;
+        var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+        if (loggedInStaff != null)
+        {
+            RoleService.UpdateSharedData($"{loggedInStaff.Role}");
+        }
+    }
+}
 <style>
 
     /* Add this to your CSS file */
@@ -69,7 +116,7 @@
     }
 
     .table {
-        width: 40%;
+        width: 100%;
         min-width: 300px; /* Tablo genişliği en az 800px olarak ayarlandı */
         border-collapse: collapse; /* Tüm çizgileri birleştirir */
         font-family: Arial, sans-serif;

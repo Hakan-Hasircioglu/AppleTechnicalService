@@ -58,6 +58,26 @@
           "lib/net8.0/Blazored.LocalStorage.dll": {}
         }
       },
+      "BlazorInputMask/1.0.24": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "8.0.3",
+          "Microsoft.AspNetCore.Components.Web": "8.0.3",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.1"
+        },
+        "compile": {
+          "lib/net8.0/BlazorInputMask.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/BlazorInputMask.dll": {}
+        },
+        "build": {
+          "buildTransitive/BlazorInputMask.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/BlazorInputMask.props": {}
+        }
+      },
       "Humanizer/2.14.1": {
         "type": "package",
         "dependencies": {
@@ -2996,6 +3016,24 @@
         "lib/net6.0/Blazored.LocalStorage.dll",
         "lib/net7.0/Blazored.LocalStorage.dll",
         "lib/net8.0/Blazored.LocalStorage.dll"
+      ]
+    },
+    "BlazorInputMask/1.0.24": {
+      "sha512": "ZrznDQBLn7CVPPO1F3DX4jfTKZNj37ALmE3R67Aru9V8CaDunSJGH/wx62HvOeL+lvZygqLZQFXV2XvecIBsiw==",
+      "type": "package",
+      "path": "blazorinputmask/1.0.24",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "blazorinputmask.1.0.24.nupkg.sha512",
+        "blazorinputmask.nuspec",
+        "build/BlazorInputMask.props",
+        "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "buildMultiTargeting/BlazorInputMask.props",
+        "buildTransitive/BlazorInputMask.props",
+        "lib/net8.0/BlazorInputMask.dll",
+        "staticwebassets/imask.js",
+        "staticwebassets/main.js"
       ]
     },
     "Humanizer/2.14.1": {
@@ -8241,6 +8279,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "BlazorInputMask >= 1.0.24",
       "Blazored.LocalStorage >= 4.5.0",
       "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter >= 8.0.8",
       "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore >= 8.0.8",
@@ -8300,6 +8339,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "BlazorInputMask": {
+            "target": "Package",
+            "version": "[1.0.24, )"
+          },
           "Blazored.LocalStorage": {
             "target": "Package",
             "version": "[4.5.0, )"

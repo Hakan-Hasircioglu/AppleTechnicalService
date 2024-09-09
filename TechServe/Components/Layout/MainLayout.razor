@@ -11,30 +11,44 @@
 @inject TechServeContext DbContext
 @inject LoggedInStaff LoggedInStaff
 
-<div class="page">
-    @if (showNavbar)
-    {
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-    }
     <main>
         @if (!mainPage)
         {
-            <div style="position: fixed; top: 10px; right: 10px; background-color: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-                <div class="text-right">
-                    <p class="mb-0" style="font-weight: bold;">@fullname</p>
-                    <p class="mb-0" style="font-size: 0.9rem; color: gray;">@role</p>
-                    <button @onclick="GoToHomePage" class="btn btn-edit btndiff btndlt">Log out</button>
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Tech Serve</h1>
+            </div>
+            <div class="topbar-middle"></div>
+            <div class="topbar-right">
+                <a href="masters" class="button-link" >Service Hub</a >
+                <a href="costumers" class="button-link" >Costumers</a >
+                <a href="detailstables" class="button-link">Details</a >
+                <a href="devices" class="button-link">Devices</a >
+                <a href="spareparts" class="button-link">Spare Parts</a >
+                @if(role == "Manager" || role == "Admin")
+                {
+                    <a href="staff" class="button-link">Employees</a >
+                }
+                <div class="profile-section">
+                    <div class="profile-info">
+                        <p class="name" style="color:#0461ae;">@fullname</p>
+                        <p class="title" style="color:#c01058;">@role</p>
+                        
+                    </div
+                    <i class="fas fa-cog settings-icon" @onclick="OpenSettings"></i>
+                    @if(isSettingOpen)
+                    {
+                        <button class="logout-button btndlt" @onclick="GoToHomePage">Log Out</button>
+                    }
                 </div>
             </div>
+        </div>
         }
 
         <article class="content px-4">
             @Body
         </article>
     </main>
-</div>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
@@ -46,16 +60,23 @@
 
     private bool showNavbar;
     private bool mainPage;
+    private bool isSettingOpen;
     private LoggedInStaff loggedInStaff = new LoggedInStaff();
     private string fullname;
-    private string role;
+    public string role;
     private string currentPage;
+
 
     private async Task GoToHomePage()
     {    
         await DbContext.TruncateLoggedInStaffTableAsync();
         NavigationManager.NavigateTo("/loadingpage?source=master");
         StateHasChanged();
+    }
+
+    protected void OpenSettings()
+    {
+        isSettingOpen = !isSettingOpen;
     }
 
     protected override void OnInitialized()
@@ -135,6 +156,99 @@
 }
 
 <style>
+.button-link {
+    display: inline-block;
+    background-color: #c01058; /* Buton rengi */
+    color: white; /* Yazı rengi */
+    padding: 10px 15px;
+    text-decoration: none; /* Alt çizgi kaldır */
+    border-radius: 5px; /* Köşeleri yuvarla */
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border: 1px solid transparent; /* Kenarlık rengini şeffaf yap */
+    margin-left: 5px;
+}
+
+.button-link:hover {
+    background-color: #ef8b0c; /* Hover rengi */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Hover efektine gölge ekle */
+}
+
+.button-link:active {
+    background-color: #c01058; /* Tıklama rengi */
+}
+
+
+    .topbar {
+        display: flex;
+        align-items: center;
+        background-color: #0461ae;
+        color: #edd7d3;
+        padding: 10px;
+        position: relative;
+        height: 60px; /* Topbar yüksekliğini ayarlayın */
+    }
+
+    .topbar-left {
+        flex: 1;
+    }
+
+    .topbar-middle {
+        flex: 2;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        position: relative;
+        margin-left: auto; /* Profil kısmını en sağa yerleştirmek için */
+    }
+
+    .profile-section {
+        background-color: #efefef;
+        padding: 10px;
+        border-radius: 5px;
+        position: absolute;
+        right: 0;
+        top: 55px; /* Profil kısmını topbar'ın altına yerleştirin */
+        width: 200px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1; /* Profil kısmının butonlardan üstte görünmesini sağlar */
+    }
+
+    .profile-info {
+        margin-bottom: 10px;
+    }
+
+    .name {
+        font-weight: bold;
+        margin: 0;
+        color:black;
+    }
+
+    .title {
+        margin: 0;
+        color: #111111;
+    }
+
+    .logout-button {
+
+        color: white;
+        padding: 5px;
+        cursor: pointer;
+        width: 100%;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+
+
+    .settings-icon {
+        color: black; /* İkon rengini siyah yapar */
+        font-size: 14px;
+        cursor: pointer;
+    }
     .btn {
         display: inline-block;
         padding: 10px 20px;

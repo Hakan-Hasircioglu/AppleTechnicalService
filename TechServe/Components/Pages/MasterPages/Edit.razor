@@ -6,13 +6,14 @@
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using System.Text.Json
 @using Blazored.LocalStorage
-
+@using Services
 
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject TechServeContext DbContext
 @inject ProtectedSessionStorage sessionStorage
-
+@inject LoggedInStaff LoggedInStaff
+@inject RoleService RoleService
 <PageTitle>Edit</PageTitle>
 
 <h1>Edit</h1>
@@ -30,20 +31,20 @@ else
             <div class="col-md-8">
                 <EditForm method="post" Model="Master" OnValidSubmit="UpdateMaster" FormName="edit" Enhance>
                     <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    <input type="hidden" name="Master.id" value="@Master.id" />
+                    <ValidationSummary class="text-danger" />
                     <div class="col-md-6">
-                        <label for="costumername" class="form-label">CostumerName:</label>
+                        <label for="costumername" class="form-label">Costumer Name:</label>
                         <InputText id="costumername" @bind-Value="Master.CostumerName" class="form-control" />
                         <ValidationMessage For="() => Master.CostumerName" class="text-danger" />
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-3">
-                            <label for="phone" class="form-label">Phone:</label>
-                            <InputText id="phone" @bind-Value="Master.Phone" class="form-control" />
+                        <div class="col-md-2">
+                            <label for="phone" class="form-label" >Phone:</label>
+                            <InputText id="phone" @bind-Value="Master.Phone" class="form-control" placeholder="(555)" />
                             <ValidationMessage For="() => Master.Phone" class="text-danger" />
                         </div>
-                        <div class="mb-3">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
                             <label for="e_mail" class="form-label">E_Mail:</label>
                             <InputText id="e_mail" @bind-Value="Master.E_Mail" class="form-control" />
                             <ValidationMessage For="() => Master.E_Mail" class="text-danger" />
@@ -91,7 +92,7 @@ else
                                 <select @onchange="OnDeviceModelChanged" class="form-control">
                                     @foreach (var model in DeviceModelOptions)
                                     {
-                                        <option value="@model">@model</option>
+                                        <option value="@model" selected="@((model == Master.DevicelModel) ? "selected" : null)">@model</option>
                                     }
                                 </select>
                             </div>
@@ -104,7 +105,7 @@ else
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label for="servicestatus" class="form-label">Service Status:</label>
-                            <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control">
+                            <InputSelect id="servicestatus" @bind-Value="Master.ServiceStatus" class="form-control" @onclick="CalculatePrice">
                                 @foreach (var status in ServiceStatusOptions)
                                 {
                                     <option value="@status">@status</option>
@@ -115,7 +116,7 @@ else
                         <div class="col-md-1"></div>
                         <div class="col-md-3">
                             <label for="typeofservice" class="form-label">Type Of Service:</label>
-                            <InputSelect id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control">
+                            <InputSelect id="typeofservice" @bind-Value="Master.TypeOfService" class="form-control" @onclick="CalculatePrice">
                                 @foreach (var status in TypeOfServiceOptions)
                                 {
                                     <option value="@status">@status</option>
@@ -127,30 +128,33 @@ else
 
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-12 containerrr">
+                        @if (isActiveUsedPartsBar)
+                        {
+                            <div class="col-md-12 containerrr">
 
-                            <label for="usedparts" class="used-parts">UsedParts:</label>
-                            <InputText id="usedparts" @bind-Value="Master.UsedParts" class="form-control" Readonly @onclick=ToggleCheckboxList />
-                            <ValidationMessage For="() => Master.UsedParts" class="text-danger" />
+                                <label for="usedparts" class="used-parts">UsedParts:</label>
+                                <InputText id="usedparts" @bind-Value="Master.UsedParts" class="form-control" Readonly @onclick=ToggleCheckboxList />
+                                <ValidationMessage For="() => Master.UsedParts" class="text-danger" />
 
 
-                            @if (isCheckboxListVisible)
-                            {
-                                <div class="checkbox-list">
-                                    @if (spareParts != null && spareParts.Count > 0 && Master.TypeOfService != "")
-                                    {
-                                        @foreach (var part in spareParts)
+                                @if (isCheckboxListVisible)
+                                {
+                                    <div class="checkbox-list">
+                                        @if (spareParts != null && spareParts.Count > 0 && Master.TypeOfService != "")
                                         {
-                                            <InputCheckbox @bind-Value="@part.IsSelected" />
-                                            <label>@part.PartsType</label>
+                                            @foreach (var part in spareParts)
+                                            {
+                                                <InputCheckbox @bind-Value="@part.IsSelected" />
+                                                <label>@part.PartsType</label>
 
-                                            <br />
+                                                <br />
+                                            }
+                                            <button type="button" class="btn btn-primary" @onclick="CalculatePrice">Calculate Price</button>
                                         }
-                                        <button type="button" class="btn btn-primary" @onclick="CalculatePrice">Calculate Price</button>
-                                    }
-                                </div>
-                            }
-                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-3">
@@ -197,7 +201,7 @@ else
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-edit">Save</button>
+                    <button type="submit" class="btn btn-edit">Create</button>
                 </EditForm>
             </div>
         </div>
@@ -211,50 +215,113 @@ else
 @code {
     [SupplyParameterFromQuery]
     public int id { get; set; }
+    private bool isLoading = true;
 
     [SupplyParameterFromForm]
     public Master? Master { get; set; }
+    [SupplyParameterFromForm]
+    public DetailsTable? DetailsTable { get; set; }
+    [SupplyParameterFromForm]
+    public Costumers? Costumers { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(250);
+        var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+        if (loggedInStaff != null)
+        {
+            RoleService.UpdateSharedData($"{loggedInStaff.Role}");
+        }
+        await Task.Delay(250);
+
+        using var context = DbFactory.CreateDbContext();
+        Master ??= await context.Master.FirstOrDefaultAsync(m => m.id == id);
+
+        if (Master is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+        await Task.Delay(250);
+
+        DetailsTable ??= await context.Details.FirstOrDefaultAsync(m => m.id == id);
+
+        if (DetailsTable is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+        await Task.Delay(250);
+
+        Costumers ??= await context.Costumers.FirstOrDefaultAsync(m => m.id == id);
+
+        if (Costumers is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+        await Task.Delay(250);
+
+        isLoading = false;
+        isActiveUsedPartsBar = true;
+        await LoadSparePartsAsync();
+        await Task.Delay(250);
+        RestoreCheckboxListFromUsedParts();
+    }
     private void OnBrandChanged(ChangeEventArgs e)
     {
         // Clear the selected model if the brand is changed
         Master.DevicelModel = null;
         StateHasChanged();
     }
-
     #region ChechBox
     private int masterId;
     private string selectedDeviceModel;
     private float masterPrice;
-    private List<SparePartsCheckboxModel> spareParts;
+    private List<SparePartsCheckboxModel> spareParts = new List<SparePartsCheckboxModel>();
     private List<SparePartsCheckboxModel> selectedParts = new List<SparePartsCheckboxModel>();
     private bool isCheckboxListVisible = false;
+    private bool isActiveUsedPartsBar = true;
 
     private void ToggleCheckboxList()
     {
-        if (isCheckboxListVisible == false)
+        if (!isCheckboxListVisible)
         {
             isCheckboxListVisible = true;
+        }
+        else if (isCheckboxListVisible)
+        {
+            CalculatePrice();
         }
     }
 
     private string GetSelectedPartsAsString()
     {
-        var selectedParts = spareParts
-            .Where(p => p.IsSelected)
-            .Select(p => p.PartsType)
-            .ToList();
+        if (spareParts != null)
+        {
+            var selectedParts = spareParts
+                .Where(p => p.IsSelected)
+                .Select(p => p.PartsType)
+                .ToList();
 
-        return string.Join(", ", selectedParts);
+            return string.Join(" - ", selectedParts);
+        }
+        return string.Empty;
     }
+
     private async Task OnDeviceModelChanged(ChangeEventArgs e)
     {
         selectedDeviceModel = e.Value.ToString();
+        Master.ServiceStatus = null;
+        Master.TypeOfService = null;
+        CalculatePrice();
+        Master.UsedParts = null;
+        Master.Price = 0;
+        StateHasChanged();
         await LoadSparePartsAsync();
+        // CalculatePrice();
     }
 
     private async Task LoadSparePartsAsync()
     {
+        selectedDeviceModel = Master.DevicelModel;
         if (!string.IsNullOrEmpty(selectedDeviceModel))
         {
             spareParts = await DbFactory.CreateDbContext().SpareParts
@@ -267,11 +334,13 @@ else
                         SparePrice = sp.SparePrice,
                         IsSelected = false
                     })
-                .ToListAsync();
+            .ToListAsync();
+            isActiveUsedPartsBar = true;
         }
         else
         {
             spareParts = new List<SparePartsCheckboxModel>();
+            isActiveUsedPartsBar = false;
         }
     }
     private async Task CalculatePrice()
@@ -290,11 +359,33 @@ else
         }
         Master.DevicelModel = selectedDeviceModel;
         Master.Price = totalCost;
-        var usedParts = GetSelectedPartsAsString();
-        Master.UsedParts = usedParts;
+
+        Master.UsedParts = GetSelectedPartsAsString();
 
         isCheckboxListVisible = false;
     }
+    private void RestoreCheckboxListFromUsedParts()
+    {
+        if (!string.IsNullOrEmpty(Master.UsedParts) && spareParts != null)
+        {
+            // " - " ile ayrılmış PartsType değerlerini alıyoruz
+            var usedPartsArray = Master.UsedParts.Split(" - ");
+
+            // spareParts listesindeki öğeleri buna göre işaretliyoruz
+            foreach (var part in spareParts)
+            {
+                if (usedPartsArray.Contains(part.PartsType))
+                {
+                    part.IsSelected = true;
+                }
+                else
+                {
+                    part.IsSelected = false;
+                }
+            }
+        }
+    }
+
     private class SparePartsCheckboxModel
     {
         public string PartsType { get; set; }
@@ -305,9 +396,11 @@ else
     }
     #endregion
 
+
+    #region Lists
     private List<string> FilteredDeviceModelOptions => Master.DevicelBrand == "Apple"
-       ? DeviceModelOptions.Where(m => m.StartsWith("iPhone")).ToList()
-       : new List<string>();
+        ? DeviceModelOptions.Where(m => m.StartsWith("iPhone")).ToList()
+        : new List<string>();
     private List<string> DeviceBrandOptions = new List<string>
     {
         "Apple",
@@ -357,46 +450,64 @@ else
         "In Progress",
         "Completed"
     };
-
-
-
-
-    protected override async Task OnInitializedAsync()
-    {
-
-        using var context = DbFactory.CreateDbContext();
-        Master ??= await context.Master.FirstOrDefaultAsync(m => m.id == id);
-
-        if (Master is null)
-        {
-            NavigationManager.NavigateTo("notfound");
-        }
-    }
+    #endregion
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
     // For more details, see https://aka.ms/RazorPagesCRUD.
     public async Task UpdateMaster()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(Master!).State = EntityState.Modified;
-
+        using var _context = DbFactory.CreateDbContext();
         try
         {
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!MasterExists(Master!.id))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
-        }
+            // Master tablosunu güncelle
+            _context.Attach(Master!).State = EntityState.Modified;
 
-        NavigationManager.NavigateTo("/masters");
+            await _context.SaveChangesAsync();
+            await Task.Delay(250);
+
+            // Costumers tablosunu güncelle
+            var costumer = await _context.Costumers
+                .FirstOrDefaultAsync(c => c.id == Master.id);
+            if (costumer != null)
+            {
+                // Costumer nesnesini Staff verileri ile güncelle
+                costumer.CostumerName = Master.CostumerName;
+                costumer.Phone = Master.Phone;
+                costumer.Adress = Master.Adress;
+                costumer.E_Mail = Master.E_Mail;
+                costumer.City = Master.City;
+                costumer.PostalCode = Master.PostalCode;
+                // Diğer gerekli alanları da güncelle
+                _context.Costumers.Update(costumer);
+                await Task.Delay(250);
+            }
+
+            // Details tablosunu güncelle
+            var details = await _context.Details
+                .FirstOrDefaultAsync(d => d.id == Master.id);
+            if (details != null)
+            {
+                // Details nesnesini Staff verileri ile güncelle
+                details.ArrivalDate = Master.ArrivalDate.ToDateTime(TimeOnly.MinValue);
+                details.ServiceStatus = Master.ServiceStatus;
+                details.ServiceCode = Master.ServiceCode;
+                details.Price = Master.Price;
+                details.TypeOfService = Master.TypeOfService;
+                details.CompletionDate = Master.CompletionDate.ToDateTime(TimeOnly.MinValue);
+                details.Description = Master.Description;
+                details.PartsUsedForRepair = Master.UsedParts;
+                _context.Details.Update(details);
+                await Task.Delay(250);
+            }
+
+            // Değişiklikleri kaydet
+            await _context.SaveChangesAsync();
+            await Task.Delay(150);
+            NavigationManager.NavigateTo("/masters");
+        }
+        catch (Exception ex)
+        {
+        }
     }
 
     bool MasterExists(int id)

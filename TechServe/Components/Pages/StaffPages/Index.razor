@@ -4,40 +4,70 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using TechServe.Model
 @using TechServe.Data
+@using Services
+@using TechServe.Components.Helpers
+
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
-@implements IAsyncDisposable
+@inject TechServeContext DbContext
+@inject NavigationManager NavigationManager
+@inject NavigationManager NavigationManager
+@inject LoggedInStaff LoggedInStaff
+@inject RoleService RoleService
+<PageTitle>Employees</PageTitle>
+@if (isLoading)
+{
+    <div class="spinner">Loading...</div>
+}
+else
+{
+    <h1>Employees</h1>
 
-<PageTitle>Staffs</PageTitle>
+    <p>
+        <a href="staff/create" class="btn btn-edit">Add New Employees</a>
+    </p>
 
-<h1>Staffs</h1>
+    <div class="table-container">
+        <QuickGrid Class="table table-striped table-hover" Items="context.Staff">
+@*             <PropertyColumn Property="staff => staff.StaffUsername" Title="User name"/>
+            <PropertyColumn Property="staff => staff.PasswordSimple" Title="Password"/> *@
+            <PropertyColumn Property="staff => staff.FullName" Title="Full Name"/>
+            <PropertyColumn Property="staff => staff.Role" Title="Role"/>
 
-<p>
-    <a href="spareparts/create" class="btn btn-edit">Create New</a>
-</p>
-
-<div class="table-container">
-    <QuickGrid Class="table table-striped table-hover" Items="context.Staff">
-    <PropertyColumn Property="staff => staff.StaffUsername" />
-    <PropertyColumn Property="staff => staff.PasswordSimple" />
-    <PropertyColumn Property="staff => staff.FullName" />
-    <PropertyColumn Property="staff => staff.Role" />
-
-    <TemplateColumn Context="staff">
-        <a href="@($"staff/edit?id={staff.id}")" class="btn btn-edit btndiff">Edit</a> |
-        <a href="@($"staff/details?id={staff.id}")" class="btn btn-edit btndiff">Details</a> |
-        <a href="@($"staff/delete?id={staff.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
-</div>
-
+            <TemplateColumn Context="staff" Title="Controlls">
+                @if(RoleService.Role == "Manager" && staff.Role != "Admin")
+                {
+                    <a href="@($"staff/edit?id={staff.id}")" class="btn btn-edit btndiff">Edit</a> <span>|</span>
+                    <a href="@($"staff/details?id={staff.id}")" class="btn btn-edit btndiff">Details</a> 
+                    <a href="@($"staff/delete?id={staff.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
+                }
+                @if(RoleService.Role == "Admin")
+                {
+                    <a href="@($"staff/edit?id={staff.id}")" class="btn btn-edit btndiff">Edit</a> <span>|</span>
+                    <a href="@($"staff/details?id={staff.id}")" class="btn btn-edit btndiff">Details</a> 
+                    <a href="@($"staff/delete?id={staff.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
+                }
+                |
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+}
 @code {
     TechServeContext context = default!;
-
+    private bool isLoading = true;
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
     }
-
+     protected override async Task OnInitializedAsync()
+    {       
+        await Task.Delay(250);
+        isLoading = false;
+        var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+        if (loggedInStaff != null)
+        {
+            RoleService.UpdateSharedData($"{loggedInStaff.Role}");
+        }
+    }
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
 <style>
@@ -85,7 +115,7 @@
     }
 
     .table {
-        width: 40%;
+        width: 100%;
         min-width: 400px; /* Tablo genişliği en az 800px olarak ayarlandı */
         border-collapse: collapse; /* Tüm çizgileri birleştirir */
         font-family: Arial, sans-serif;

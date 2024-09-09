@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v8.0": {
       "TechServe/1.0.0": {
         "dependencies": {
+          "BlazorInputMask": "1.0.24",
           "Blazored.LocalStorage": "4.5.0",
           "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter": "8.0.8",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "8.0.8",
@@ -62,6 +63,19 @@
           "lib/net8.0/Blazored.LocalStorage.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "BlazorInputMask/1.0.24": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "8.0.8",
+          "Microsoft.AspNetCore.Components.Web": "8.0.8",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.1"
+        },
+        "runtime": {
+          "lib/net8.0/BlazorInputMask.dll": {
+            "assemblyVersion": "1.0.24.0",
+            "fileVersion": "1.0.24.0"
           }
         }
       },
@@ -2042,6 +2056,13 @@
       "sha512": "sha512-6nZuJwA7zNIKx83IsObiHXZb09ponJOpCClU3en+hI8ZFvrOKXeOw+H7TegQZQrvdR1n9fkrVkEBQZg8vx6ZTw==",
       "path": "blazored.localstorage/4.5.0",
       "hashPath": "blazored.localstorage.4.5.0.nupkg.sha512"
+    },
+    "BlazorInputMask/1.0.24": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZrznDQBLn7CVPPO1F3DX4jfTKZNj37ALmE3R67Aru9V8CaDunSJGH/wx62HvOeL+lvZygqLZQFXV2XvecIBsiw==",
+      "path": "blazorinputmask/1.0.24",
+      "hashPath": "blazorinputmask.1.0.24.nupkg.sha512"
     },
     "Humanizer/2.14.1": {
       "type": "package",

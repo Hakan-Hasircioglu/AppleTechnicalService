@@ -3,43 +3,240 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using TechServe.Model
+@using TechServe.Data
+@using Services
+@using TechServe.Components.Helpers
+
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
+@inject TechServeContext DbContext
+@inject NavigationManager NavigationManager
+@inject NavigationManager NavigationManager
+@inject LoggedInStaff LoggedInStaff
+@inject RoleService RoleService
 
-<PageTitle>Master</PageTitle>
+<PageTitle>Service Hub</PageTitle>
 
-<h1>Master</h1>
-
+<h1>Service Hub</h1>
+@if (isLoading)
+{
+    <div class="spinner">Loading...</div>
+}
+else
+{
 <p>
     <a href="masters/create" class="btn btn-edit">Add New Device</a>
 </p>
 <div class="table-container">
-    <QuickGrid Class="table table-striped table-hover" Items="DbFactory.CreateDbContext().Master">
-    <PropertyColumn Property="master => master.CostumerName" />
-@*     <PropertyColumn Property="master => master.Phone" />
-    <PropertyColumn Property="master => master.E_Mail" />
-    <PropertyColumn Property="master => master.Adress" />
-    <PropertyColumn Property="master => master.City" />
-    <PropertyColumn Property="master => master.PostalCode" /> *@
-    <PropertyColumn Property="master => master.DevicelBrand" />
-    <PropertyColumn Property="master => master.DevicelModel" />
-    <PropertyColumn Property="master => master.TypeOfService" />
-    <PropertyColumn Property="master => master.ServiceStatus" />
-@*     <PropertyColumn Property="master => master.ServiceCode" /> *@
-    <PropertyColumn Property="master => master.Description" />
-    <PropertyColumn Property="master => master.Price"/>
-@*     <PropertyColumn Property="master => master.ArrivalDate" />
-    <PropertyColumn Property="master => master.CompletionDate" /> *@
-
-    <TemplateColumn Context="master">
-            <a href="@($"masters/edit?id={master.id}")" class="btn btn-edit btndiff">Edit</a> |
-            <a href="@($"masters/details?id={master.id}")" class="btn btn-edit btndiff">Details</a> |
-            <a href="@($"masters/delete?id={master.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+        <!-- Filtreleme Alanları -->
+        <div class="filter-section">
+            <div class="row justify-content-between">
+                <div class="col-md-2">
+                    <label>Customer Name:</label>
+                    <input type="text" @oninput="OnCustomerNameChangedHandler" class="form-control" placeholder="Search by name" />
+                </div>
+                <div class="col-md-3">
+                </div>
+                <div class="col-md-2">
+                    <label>Service Code:</label>
+                    <input type="text" @oninput="OnBarcodeChangedHandler" class="form-control" placeholder="Search by Service code" />
+                </div>
+                <div class="col-md-1">
+                    <label>Brand:</label>
+                    <select @onchange="OnBrandChangedHandler" class="form-select">
+                        <option value="">All</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Samsung">Samsung</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label>Model:</label>
+                    <select @onchange="OnModelChangedHandler" class="form-select">
+                        <option value="">All</option>
+                        <option value="iPhone 11">iPhone 11</option>
+                        <option value="iPhone 11 Pro">iPhone 11 Pro</option>
+                        <option value="iPhone 11 Pro Max">iPhone 11 Pro Max</option>
+                        <option value="iPhone 12">iPhone 12</option>
+                        <option value="iPhone 12 Pro">iPhone 12 Pro</option>
+                        <option value="iPhone 12 Pro Max">iPhone 12 Pro Max</option>
+                        <option value="iPhone 13">iPhone 13</option>
+                        <option value="iPhone 13 Pro">iPhone 13 Pro</option>
+                        <option value="iPhone 13 Pro Max">iPhone 13 Pro Max</option>
+                        <option value="iPhone 14">iPhone 14</option>
+                        <option value="iPhone 14 Pro">iPhone 14 Pro</option>
+                        <option value="iPhone 14 Pro Max">iPhone 14 Pro Max</option>
+                        <option value="iPhone 15">iPhone 15</option>
+                        <option value="iPhone 15 Pro">iPhone 15 Pro</option>
+                        <option value="iPhone 15 Pro Max">iPhone 15 Pro Max</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label>Type:</label>
+                    <select @onchange="OnServiceTypeChangedHandler" class="form-select">
+                        <option value="">All</option>
+                        <option value="Repair">Repair</option>
+                        <option value="Replacement">Replacement</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label>Status:</label>
+                    <select @onchange="OnServiceStatusChangedHandler" class="form-select">
+                        <option value="">All</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+<!-- Table Display -->
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Customer Name</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Service Type</th>
+            <th>Service Status</th>
+            <th>Service Code</th>
+            <th>Price</th>
+            <th>Arrival</th>
+            <th>Completion</th>
+            <th>Controls</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var master in filteredMasters)
+        {
+            <tr>
+                <td>@master.CostumerName</td>
+                <td>@master.DevicelBrand</td>
+                <td>@master.DevicelModel</td>
+                <td>@master.TypeOfService</td>
+                <td>@master.ServiceStatus</td>
+                <td>@master.ServiceCode</td>
+                <td>@master.Price</td>
+                <td>@master.ArrivalDate.ToString("yyyy-MM-dd")</td>
+                <td>
+                    @if (master.CompletionDate == DateOnly.MinValue)
+                    {
+                        <span>Not Completed</span>
+                    }
+                    else
+                    {
+                        <span>@master.CompletionDate.ToString("yyyy-MM-dd")</span>
+                    }
+                </td>
+                <td>
+                    @if (RoleService.Role != "Staff")
+                    {
+                        <a href="@($"masters/edit?id={master.id}")" class="btn btn-edit btndiff">Edit</a>
+                    } |
+                    <a href="@($"masters/details?id={master.id}")" class="btn btn-edit btndiff">Details</a> |
+                    @if (RoleService.Role != "Staff")
+                    {
+                        <a href="@($"masters/delete?id={master.id}")" class="btn btn-edit btndiff btndlt">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 </div>
+}
+@code {
+    private Master master { get; set; }
+    private IEnumerable<Master> allMasters;
+    private IEnumerable<Master> filteredMasters;
+    private string selectedServiceType = string.Empty; 
+    private string selectedServiceStatus = string.Empty;
+    private string selectedModel = string.Empty;
+    private string selectedBrand = string.Empty;
+    private string customerNameSearch = string.Empty;
+    private string selectedStatus = string.Empty;
+    private string BarcodeSearch = string.Empty;
+    private bool isLoading = true;
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500);
+        isLoading = false;
+        var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+        if (loggedInStaff != null)
+        {
+            RoleService.UpdateSharedData($"{loggedInStaff.Role}");
+        }
+    }
+    protected override void OnInitialized()
+    {
+        // Veriyi al
+        allMasters = DbFactory.CreateDbContext().Master;
+        // Başlangıçta tüm verileri göster
+        filteredMasters = allMasters;
+    }
+    private void OnBarcodeChangedHandler(ChangeEventArgs e)
+    {
+        BarcodeSearch = e.Value.ToString();
+        FilterData();
+    }
+    private void OnServiceTypeChangedHandler(ChangeEventArgs e)
+    {
+        selectedServiceType = e.Value.ToString();
+        FilterData();
+    }
+    private void OnServiceStatusChangedHandler(ChangeEventArgs e)
+    {
+        selectedServiceStatus = e.Value.ToString();
+        FilterData();
+    }
+    private void OnModelChangedHandler(ChangeEventArgs e)
+    {
+        selectedModel = e.Value.ToString();
+        FilterData();
+    }
+
+    private void OnBrandChangedHandler(ChangeEventArgs e)
+    {
+        selectedBrand = e.Value.ToString();
+        FilterData();
+    }
+
+    private void OnCustomerNameChangedHandler(ChangeEventArgs e)
+    {
+        customerNameSearch = e.Value.ToString().ToLower();
+        FilterData();
+    }
+
+    private void FilterData()
+    {
+        filteredMasters = allMasters
+         .Where(master => (string.IsNullOrEmpty(selectedServiceType) || master.TypeOfService == selectedServiceType)
+                       && (string.IsNullOrEmpty(selectedModel) || master.DevicelModel == selectedModel)
+                       && (string.IsNullOrEmpty(selectedBrand) || master.DevicelBrand == selectedBrand)
+                       && (string.IsNullOrEmpty(selectedServiceStatus) || master.ServiceStatus == selectedServiceStatus)
+                       && (string.IsNullOrEmpty(customerNameSearch) || master.CostumerName.ToLower().Contains(customerNameSearch))
+                       && (string.IsNullOrEmpty(BarcodeSearch) || master.ServiceCode.Contains(BarcodeSearch)));
+    }
+}
 
    <style>
 
+    .filter-section {
+        border: 2px solid #0461ae; /* Çevresine mavi bir sınır ekleyelim */
+        border-radius: 4px; /* Köşeleri yuvarlak yapalım */
+        padding: 5px; /* İçeriğin kenarlardan uzak durması için padding ekleyelim */
+        background-color: #f5f5f5; /* Arka plan rengini açık gri yapalım */
+        margin-bottom: 5px; /* Filtreleme alanı ile aşağıdaki içerik arasında boşluk bırakalım */
+    }
+    /* Sağda sabit konumlandırılmış select */
+    .select-container {
+        display: flex;
+        justify-content: flex-end; /* Sağ tarafa hizala */
+        padding: 10px; /* İç boşluk */
+        background-color: #edd7d3; /* Arka plan rengini hafif gri yap */
+    }
+
+        .select-container select {
+            width: auto; /* Genişliği otomatik ayarla */
+            max-width: 200px; /* Maksimum genişlik ayarla */
+        }
     /* Add this to your CSS file */
     .btn {
         display: inline-block;
@@ -57,8 +254,8 @@
     }
 
     .btn-edit {
-        border-color: #007bff; /* Blue border */
-        color: #007bff; /* Blue text */
+        border-color: #0461ae; /* Blue border */
+        color: #0461ae; /* Blue text */
     }
 
         .btn-edit:hover {
@@ -94,7 +291,7 @@
         .table th, .table td {
             padding: 5px;
             text-align: left;
-            border: 1px solid #87cefa; /* Açık mavi tonlarında kenarlık */
+            border: 1px solid #0461ae; /* Açık mavi tonlarında kenarlık */
             white-space: nowrap; /* Satırların tek satırda kalmasını sağlar */
         }
 

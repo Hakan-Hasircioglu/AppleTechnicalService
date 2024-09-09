@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "ECVrSBekvRfCivVBCg53RVc7lSvnzD8XWyolIh6xUyY=",
+  "Hash": "Gayfi9EUgcuBaBQrUh98WQUbUjyGE9UkigxdZRY8lCk=",
   "Source": "TechServe",
   "BasePath": "_content/TechServe",
   "Mode": "Default",
@@ -16,6 +16,44 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "C:\\Users\\hasir\\.nuget\\packages\\blazorinputmask\\1.0.24\\staticwebassets\\imask.js",
+      "SourceId": "BlazorInputMask",
+      "SourceType": "Package",
+      "ContentRoot": "C:\\Users\\hasir\\.nuget\\packages\\blazorinputmask\\1.0.24\\staticwebassets\\",
+      "BasePath": "_content/BlazorInputMask",
+      "RelativePath": "imask.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\hasir\\.nuget\\packages\\blazorinputmask\\1.0.24\\staticwebassets\\imask.js"
+    },
+    {
+      "Identity": "C:\\Users\\hasir\\.nuget\\packages\\blazorinputmask\\1.0.24\\staticwebassets\\main.js",
+      "SourceId": "BlazorInputMask",
+      "SourceType": "Package",
+      "ContentRoot": "C:\\Users\\hasir\\.nuget\\packages\\blazorinputmask\\1.0.24\\staticwebassets\\",
+      "BasePath": "_content/BlazorInputMask",
+      "RelativePath": "main.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\hasir\\.nuget\\packages\\blazorinputmask\\1.0.24\\staticwebassets\\main.js"
+    },
     {
       "Identity": "C:\\Users\\hasir\\.nuget\\packages\\microsoft.aspnetcore.components.quickgrid\\8.0.8\\staticwebassets\\Microsoft.AspNetCore.Components.QuickGrid.bundle.scp.css",
       "SourceId": "Microsoft.AspNetCore.Components.QuickGrid",

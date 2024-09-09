@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Blazored.LocalStorage;
 using TechServe.Model;
 using System.Configuration;
+using TechServe.Components.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ builder.Services.AddDbContext<TechServeContext>(options =>
     ServiceLifetime.Scoped);
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<RoleService>();
 builder.Services.AddSingleton <LoggedInStaff>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
