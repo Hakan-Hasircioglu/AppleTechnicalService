@@ -45,7 +45,7 @@ else
                 <th>Model</th>
                 <th>Parts Type</th>
                 <th>Quantity</th>
-                <th>Service Code</th>
+                <th>Barcode</th>
                 <th>Price</th>
                 <th>Repair Cost Of The Part</th>
                 <th>Replacement Cost Of The Part</th>
@@ -110,7 +110,7 @@ else
     }
     protected override async Task OnInitializedAsync()
     {       
-        await Task.Delay(250);
+        await Task.Delay(500);
         isLoading = false;
         var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
         if (loggedInStaff != null)

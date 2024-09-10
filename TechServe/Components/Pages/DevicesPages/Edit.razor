@@ -33,14 +33,14 @@ else
                     <InputText id="devicelmodel" @bind-Value="Devices.DevicelModel" class="form-control" />
                     <ValidationMessage For="() => Devices.DevicelModel" class="text-danger" />
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit"  class="btn btn-edit">Save</button>
             </EditForm>
         </div>
     </div>
 }
 
 <div>
-    <a href="/devices">Back to List</a>
+    <a href="/devices" class="btn btn-back">Back to List</a>
 </div>
 
 @code {
@@ -91,3 +91,100 @@ else
         return context.Devices.Any(e => e.id == id);
     }
 }
+<style>
+    .container {
+        position: relative;
+    }
+
+    .used-parts {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .checkbox-list {
+        position: absolute;
+        background: white;
+        border: 1px solid #ddd;
+        padding: 5px;
+        z-index: 1000;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+        width: 300px;
+    }
+
+        .checkbox-list div {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .checkbox-list input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+        }
+
+
+    .btn-primary {
+        margin-top: 10px;
+    }
+
+    .custom-button {
+        height: 20px;
+        line-height: 0px;
+        font-size: 14px;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+
+
+    .form-check {
+        flex: 1 0 33%;
+        margin: 20px;
+        display: inline-block;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid;
+        background-color: transparent;
+        color: currentColor;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff;
+        color: #007bff;
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+    .btn-back {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+</style>

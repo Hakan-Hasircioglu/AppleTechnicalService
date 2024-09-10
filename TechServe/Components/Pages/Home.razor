@@ -13,8 +13,8 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="form-container">
-        <h3>Login</h3>
+    <div class="form-container" style="margin-top:100px;">
+        <h1 style="color:#0461ae; margin-bottom:35px;">Technical Service User Login</h1>
 
         <div class="form-group">
             <label for="username">User Name:</label>
@@ -25,9 +25,14 @@
             <label for="password">Password:</label>
             <InputText id="password" type="password" class="form-control" @bind-Value="password" />
         </div>
-
-        <button type="submit" class="btn-primary">Login</button>
-
+        @if (username != "000000")
+        {
+            <button type="submit" class="btn-primary">Login</button>
+        }
+        else
+        {
+            <button type="button" class="btn-primary">Login</button>
+        }
         @if(nullUsername)
         {
             <div class="text-danger">Login failed. Null User Name</div>
@@ -67,7 +72,7 @@
     }
     private async Task HandleLogin()
     {
-        if (username != "" && password != "")
+        if(username != "" && password != "")
         {
             nullUsername = false;
             nullPassword = false;
@@ -177,6 +182,7 @@
         }
     }
 
+    private bool changeLocalName;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -191,6 +197,11 @@
                 // Fonksiyonu hemen çağırın
                 window.disableForwardNavigation();
             ");
+            if (changeLocalName)
+                await jsRuntime.InvokeVoidAsync("eval", $"document.title = 'Tech Serve';");
+            else
+                await jsRuntime.InvokeVoidAsync("eval", $"document.title = 'Tech Serve Login';");
+
         }
     }
     protected override async Task OnInitializedAsync()
@@ -210,6 +221,14 @@
         }
 
         StateHasChanged();
+    }
+    private string DocumentTitle
+    {
+        set
+        {
+            var js = (IJSRuntime)Navigation;
+            js.InvokeVoidAsync("eval", $"document.title = '{value}';");
+        }
     }
 }
 
@@ -245,7 +264,7 @@
     }
         .form-container h3 {
             text-align: center;
-            color: #38749c;
+            color: #0461ae;
             margin-bottom: 20px;
         }
 
@@ -258,7 +277,7 @@
             font-weight: bold;
             display: block;
             margin-bottom: 5px;
-            color: #38749c 
+            color: #0461ae;
         }
 
         .form-group .form-control {

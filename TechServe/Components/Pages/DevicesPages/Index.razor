@@ -62,7 +62,7 @@ else
     private bool isLoading = true;
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(200);
+        await Task.Delay(500);
         isLoading = false;
         var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
         if (loggedInStaff != null)

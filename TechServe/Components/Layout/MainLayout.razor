@@ -12,15 +12,14 @@
 @inject LoggedInStaff LoggedInStaff
 
     <main>
-        @if (!mainPage)
-        {
         <div class="topbar">
             <div class="imgcontainer">
     <div class="image-wrapper">
         <a href="https://www.iletisimyazilim.com/" target="_blank"><img src="1iy-logo-beyaz-zemin300x-20191004084234.png" alt="Icon" /></a>
     </div>
 </div>
-            <div class="topbar-middle"></div>
+        @if (!mainPage)
+        {
             <div class="topbar-right">
                 <a href="masters" class="button-link" >ServiceHub</a >
                 <a href="costumers" class="button-link" >Costumers</a >
@@ -44,10 +43,10 @@
                     }
                 </div>
             </div>
-        </div>
         }
+    </div>
 
-        <article class="content px-4">
+        <article class="content px-4" style="margin: 0px 15px;">
             @Body
         </article>
     </main>
@@ -229,6 +228,7 @@
         display: flex;
         align-items: center;
         position: relative;
+        margin-top:10px;
         margin-left: auto; /* Profil kısmını en sağa yerleştirmek için */
     }
 
