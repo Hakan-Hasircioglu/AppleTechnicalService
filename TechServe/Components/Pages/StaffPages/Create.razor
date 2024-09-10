@@ -127,39 +127,39 @@
 
 <style>
     .container {
-        position: relative; /* Checkbox listesinin bu kapsayıcıya göre konumlandırılmasını sağlar */
+        position: relative; 
     }
 
     .used-parts {
         cursor: pointer;
-        position: relative; /* Doğru konumlandırma için gerekli */
+        position: relative; 
     }
 
     .checkbox-list {
-        position: absolute; /* Konumlandırma için */
+        position: absolute; 
         background: white;
         border: 1px solid #ddd;
-        padding: 5px; /* İçerik etrafındaki boşluk */
-        z-index: 1000; /* Diğer içeriklerin üstünde görünmesini sağlar */
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Görsel olarak daha belirgin hale getirir */
-        display: flex; /* Flex düzeni kullanarak tek sütunlu yapıyı sağlar */
-        flex-direction: column; /* Tek sütun düzeni */
-        gap: 5px; /* Öğeler arasındaki boşluk */
-        max-height: 300px; /* Maksimum yükseklik */
-        overflow-y: auto; /* İçerik sığmıyorsa kaydırma çubuğu ekler */
-        width: 300px; /* Genişlik ayarı */
+        padding: 5px; 
+        z-index: 1000; 
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+        display: flex; 
+        flex-direction: column; 
+        gap: 5px; 
+        max-height: 300px; 
+        overflow-y: auto; 
+        width: 300px; 
     }
 
         .checkbox-list div {
             display: flex;
             align-items: center;
-            font-size: 14px; /* Yazı tipi boyutu */
+            font-size: 14px; 
         }
 
         .checkbox-list input[type="checkbox"] {
-            width: 16px; /* Checkbox genişliği */
-            height: 16px; /* Checkbox yüksekliği */
-            margin-right: 4px; /* Checkbox ile etiket arasındaki boşluk */
+            width: 16px; 
+            height: 16px; 
+            margin-right: 4px; 
         }
 
 
@@ -195,30 +195,30 @@
         text-align: center;
         text-decoration: none;
         border-radius: 5px;
-        border: 2px solid; /* Thicker border */
-        background-color: transparent; /* Transparent background */
-        color: currentColor; /* Uses the color of the border */
+        border: 2px solid; 
+        background-color: transparent; 
+        color: currentColor; 
         transition: background-color 0.3s, color 0.3s;
     }
 
     .btn-edit {
-        border-color: #007bff; /* Blue border */
-        color: #007bff; /* Blue text */
+        border-color: #007bff; 
+        color: #007bff; 
     }
 
         .btn-edit:hover {
-            background-color: #007bff; /* Blue background on hover */
-            color: white; /* White text on hover */
+            background-color: #007bff; 
+            color: white; 
         }
 
     .btn-back {
-        border-color: #6c757d; /* Gray border */
-        color: #6c757d; /* Gray text */
+        border-color: #6c757d; 
+        color: #6c757d; 
     }
 
         .btn-back:hover {
-            background-color: #6c757d; /* Gray background on hover */
-            color: white; /* White text on hover */
+            background-color: #6c757d; 
+            color: white; 
         }
 
 </style>
