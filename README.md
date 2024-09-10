@@ -21,3 +21,11 @@
 
    - Filter System: The service has general and specific filters and a search bar for each table to be searched
  
+- Views of the Application:
+   - Login Page
+     ![loginpage](loginpage.png)
+   - Service Hub (Admin Login)
+     ![mainpage](mainpage.png)
+   - Service Hub (Staff Login)
+     ![mainpage](mainpagestaff.png)
+  
