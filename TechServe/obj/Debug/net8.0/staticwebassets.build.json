@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Gayfi9EUgcuBaBQrUh98WQUbUjyGE9UkigxdZRY8lCk=",
+  "Hash": "xuhLLceuoBsyy2ZVoJ/ZIwxGTeN+wpnil9W9QWurbrM=",
   "Source": "TechServe",
   "BasePath": "_content/TechServe",
   "Mode": "Default",
@@ -148,6 +148,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Users\\hasir\\source\\repos\\TechServe\\TechServe\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\TechServe.bundle.scp.css"
+    },
+    {
+      "Identity": "C:\\Users\\hasir\\source\\repos\\TechServe\\TechServe\\wwwroot\\1iy-logo-beyaz-zemin300x-20191004084234.png",
+      "SourceId": "TechServe",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\hasir\\source\\repos\\TechServe\\TechServe\\wwwroot\\",
+      "BasePath": "_content/TechServe",
+      "RelativePath": "1iy-logo-beyaz-zemin300x-20191004084234.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\1iy-logo-beyaz-zemin300x-20191004084234.png"
     },
     {
       "Identity": "C:\\Users\\hasir\\source\\repos\\TechServe\\TechServe\\wwwroot\\app.css",

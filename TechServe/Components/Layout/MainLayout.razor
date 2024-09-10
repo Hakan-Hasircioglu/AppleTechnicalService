@@ -15,21 +15,23 @@
         @if (!mainPage)
         {
         <div class="topbar">
-            <div class="topbar-left">
-                <h1>Tech Serve</h1>
-            </div>
+            <div class="imgcontainer">
+    <div class="image-wrapper">
+        <a href="https://www.iletisimyazilim.com/" target="_blank"><img src="1iy-logo-beyaz-zemin300x-20191004084234.png" alt="Icon" /></a>
+    </div>
+</div>
             <div class="topbar-middle"></div>
             <div class="topbar-right">
-                <a href="masters" class="button-link" >Service Hub</a >
+                <a href="masters" class="button-link" >ServiceHub</a >
                 <a href="costumers" class="button-link" >Costumers</a >
                 <a href="detailstables" class="button-link">Details</a >
                 <a href="devices" class="button-link">Devices</a >
-                <a href="spareparts" class="button-link">Spare Parts</a >
+                <a href="spareparts" class="button-link">SpareParts</a >
                 @if(role == "Manager" || role == "Admin")
                 {
                     <a href="staff" class="button-link">Employees</a >
                 }
-                <div class="profile-section">
+                <div class="profile-section" style="margin-bottom:15px; margin-top:15px;">
                     <div class="profile-info">
                         <p class="name" style="color:#0461ae;">@fullname</p>
                         <p class="title" style="color:#c01058;">@role</p>
@@ -156,6 +158,31 @@
 }
 
 <style>
+      .imgcontainer {
+        display: flex; /* Yatay hizalama sağlar */
+        align-items: center; /* Dikey hizalama sağlar */
+        overflow: hidden; /* Taşmayı engeller */
+        width: 100%; /* Konteyner genişliği */
+        box-sizing: border-box; /* Padding ve border dahil genişlik hesaplaması */
+        padding: 10px; /* İsteğe bağlı padding */
+    }
+
+    .image-wrapper {
+        max-width: 150px; /* Resmin genişliğini sınırlayabilirsiniz */
+        margin-right: 150px; /* Resim ile başlık arasında boşluk */
+    }
+
+    img {
+        display: block; /* Resmin etrafında boşluk bırakmaz */
+        max-width: 175%; /* Resmin genişliğini konteynere uydurur */
+        height: auto; /* Resmin oranını korur */
+    }
+
+    h1 {
+        font-size: 24px; /* Başlık boyutu */
+        margin: 0; /* Varsayılan marginleri kaldırır */
+        color: #102860; /* Başlık rengini ayarlar */
+    }
 .button-link {
     display: inline-block;
     background-color: #c01058; /* Buton rengi */
@@ -183,11 +210,11 @@
     .topbar {
         display: flex;
         align-items: center;
-        background-color: #0461ae;
-        color: #edd7d3;
+        background-color: whitesmoke;
+        color: whitesmoke;
         padding: 10px;
         position: relative;
-        height: 60px; /* Topbar yüksekliğini ayarlayın */
+        height: 90px; /* Topbar yüksekliğini ayarlayın */
     }
 
     .topbar-left {

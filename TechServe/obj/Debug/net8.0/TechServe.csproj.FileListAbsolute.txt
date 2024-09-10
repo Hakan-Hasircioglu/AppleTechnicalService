@@ -9,6 +9,7 @@ C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\TechServe.pdb
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Azure.Core.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Azure.Identity.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Blazored.LocalStorage.dll
+C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\BlazorInputMask.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Humanizer.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Microsoft.AspNetCore.Authorization.dll
 C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\Microsoft.AspNetCore.Components.dll
@@ -255,7 +256,6 @@ C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\staticwebassets
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.TechServe.props
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\staticwebassets.pack.json
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\scopedcss\Components\Layout\MainLayout.razor.rz.scp.css
-C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\scopedcss\Components\Layout\NavMenu.razor.rz.scp.css
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\scopedcss\bundle\TechServe.styles.css
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\scopedcss\projectbundle\TechServe.bundle.scp.css
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.csproj.Up2Date
@@ -264,4 +264,3 @@ C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\refint\TechServ
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.pdb
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\TechServe.genruntimeconfig.cache
 C:\Users\hasir\source\repos\TechServe\TechServe\obj\Debug\net8.0\ref\TechServe.dll
-C:\Users\hasir\source\repos\TechServe\TechServe\bin\Debug\net8.0\BlazorInputMask.dll

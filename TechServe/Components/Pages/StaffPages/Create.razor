@@ -1,12 +1,15 @@
 ﻿@page "/staff/create"
 
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
 @using TechServe.Model
 @using TechServe.Data
+@using Services
 @using TechServe.Components.Helpers
 @inject IDbContextFactory<TechServe.Data.TechServeContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject TechServeContext DbContext
+@inject RoleService RoleService
 
 <PageTitle>Add New Staff</PageTitle>
 
@@ -37,25 +40,24 @@
        
             <div class="form-group">
                 <label for="role">Role:</label>
-                <select @onchange="OnValueChanged">
-                    <option value=""></option>
-                    @foreach (var value in Roles)
+                <select @onchange="OnValueChanged" class="form-control">
+                    <option value="Staff">Staff</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Manager">Manager</option>
+                    @if (RoleService.Role == "Admin")
                     {
-                        <option value="@value">@value</option>
+                    <option value="Admin">Admin</option>
                     }
                 </select>
-            </div>
-            @if (Staff.Role != null)
-            {
-            <button type="submit" class="btn btn-primary">Create</button>
-            }
+            </div>          
+            <button type="submit" class="btn btn-edit">Create</button>
         </EditForm>
     </div>
 </div>
 
 
     <div>
-        <a href="/staff">Back to List</a>
+    <a href="/staff" class="btn btn-back">Back to List</a>
     </div>
 
 
@@ -65,6 +67,7 @@
     public Staff Staff { get; set; } = new();
     private int currentCount;
     private int newId;
+    private bool isLoading = true;
 
     private List<string> Roles = new List<string>
     {
@@ -81,6 +84,7 @@
     }
     protected override async Task OnInitializedAsync()
     {
+        await Task.Delay(200);
         newId = await DbContext.Staff
         .OrderByDescending(m => m.id)
         .Select(m => m.id)
@@ -88,6 +92,13 @@
         newId++;
         currentCount = newId;
         GenerateRandomPassword();
+        await Task.Delay(500);
+        isLoading = false;
+        var loggedInStaff = await DbContext.LoggedInStaff.FirstOrDefaultAsync();
+        if (loggedInStaff != null)
+        {
+            RoleService.UpdateSharedData($"{loggedInStaff.Role}");
+        }
     }
     private void GenerateRandomPassword()
     {
@@ -113,3 +124,101 @@
         NavigationManager.NavigateTo("/staff");
     }
 }
+
+<style>
+    .container {
+        position: relative; /* Checkbox listesinin bu kapsayıcıya göre konumlandırılmasını sağlar */
+    }
+
+    .used-parts {
+        cursor: pointer;
+        position: relative; /* Doğru konumlandırma için gerekli */
+    }
+
+    .checkbox-list {
+        position: absolute; /* Konumlandırma için */
+        background: white;
+        border: 1px solid #ddd;
+        padding: 5px; /* İçerik etrafındaki boşluk */
+        z-index: 1000; /* Diğer içeriklerin üstünde görünmesini sağlar */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Görsel olarak daha belirgin hale getirir */
+        display: flex; /* Flex düzeni kullanarak tek sütunlu yapıyı sağlar */
+        flex-direction: column; /* Tek sütun düzeni */
+        gap: 5px; /* Öğeler arasındaki boşluk */
+        max-height: 300px; /* Maksimum yükseklik */
+        overflow-y: auto; /* İçerik sığmıyorsa kaydırma çubuğu ekler */
+        width: 300px; /* Genişlik ayarı */
+    }
+
+        .checkbox-list div {
+            display: flex;
+            align-items: center;
+            font-size: 14px; /* Yazı tipi boyutu */
+        }
+
+        .checkbox-list input[type="checkbox"] {
+            width: 16px; /* Checkbox genişliği */
+            height: 16px; /* Checkbox yüksekliği */
+            margin-right: 4px; /* Checkbox ile etiket arasındaki boşluk */
+        }
+
+
+    .btn-primary {
+        margin-top: 10px;
+    }
+
+    .custom-button {
+        height: 20px;
+        line-height: 0px;
+        font-size: 14px;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+
+
+    .form-check {
+        flex: 1 0 33%;
+        margin: 20px;
+        display: inline-block;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 2px solid; /* Thicker border */
+        background-color: transparent; /* Transparent background */
+        color: currentColor; /* Uses the color of the border */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-edit {
+        border-color: #007bff; /* Blue border */
+        color: #007bff; /* Blue text */
+    }
+
+        .btn-edit:hover {
+            background-color: #007bff; /* Blue background on hover */
+            color: white; /* White text on hover */
+        }
+
+    .btn-back {
+        border-color: #6c757d; /* Gray border */
+        color: #6c757d; /* Gray text */
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d; /* Gray background on hover */
+            color: white; /* White text on hover */
+        }
+
+</style>
