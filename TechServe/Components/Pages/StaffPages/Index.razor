@@ -40,6 +40,11 @@ else
             <th>Full Name</th>
             <th>Staff Username</th>
             <th>Password</th>
+             @if(RoleService.Role == "Admin")
+                {
+            <th>Passwor dHash</th>
+                    
+                }
             <th>Role</th>
             <th>Controll</th>
         </tr>
@@ -106,6 +111,9 @@ else
         {
             RoleService.UpdateSharedData($"{loggedInStaff.Role}");
         }
+        await Task.Delay(250);
+        if (loggedInStaff.Role == "" || loggedInStaff.FullName == "")
+            NavigationManager.NavigateTo("/");
     }
     private void OnEmployeesNameChangedHandler(ChangeEventArgs e)
     {

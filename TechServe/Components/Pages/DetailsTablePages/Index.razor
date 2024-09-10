@@ -99,6 +99,9 @@ else
         {
             RoleService.UpdateSharedData($"{loggedInStaff.Role}");
         }
+        await Task.Delay(250);
+        if (loggedInStaff.Role == "" || loggedInStaff.FullName == "")
+            NavigationManager.NavigateTo("/");
     }
     protected override void OnInitialized()
     {

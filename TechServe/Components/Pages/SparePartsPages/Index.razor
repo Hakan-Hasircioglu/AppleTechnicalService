@@ -117,6 +117,9 @@ else
         {
             RoleService.UpdateSharedData($"{loggedInStaff.Role}");
         }
+        await Task.Delay(250);
+        if (loggedInStaff.Role == "" || loggedInStaff.FullName == "")
+            NavigationManager.NavigateTo("/");
     }
     private void OnBarcodeChangedHandler(ChangeEventArgs e)
     {

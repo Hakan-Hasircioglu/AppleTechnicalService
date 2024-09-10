@@ -14,10 +14,10 @@
     <ValidationSummary />
 
     <div class="form-container" style="margin-top:100px;">
-        <h1 style="color:#0461ae; margin-bottom:35px;">Technical Service User Login</h1>
+        <h1 style="color:#0461ae; margin-bottom:35px;">Tech Serve User Login</h1>
 
         <div class="form-group">
-            <label for="username">User Name:</label>
+            <label for="username">Username:</label>
             <InputText id="username" class="form-control" @bind-Value="username" />
         </div>
 
@@ -49,6 +49,12 @@
         {
             <div class="text-danger">Login failed. Wrong Password</div>
         }
+        @if (isOnHomePage)
+        {
+            <div class="text-danger">Login failed. Username and Password doesn't matching</div>
+        }
+        else
+        {}
     </div>
 </EditForm>
 
@@ -65,10 +71,16 @@
     private bool nullPassword = false;
     private bool wrongUsername = false;
     private bool wrongPassword = false;
+    private string currentUrl;
+    private bool isOnHomePage;
     private async Task DoubleHandleLogin()
     {
         await HandleLogin();
         await HandleLogin();
+        await Task.Delay(1500);
+        currentUrl = Navigation.Uri;
+        isOnHomePage = currentUrl.Contains("/", StringComparison.OrdinalIgnoreCase);
+
     }
     private async Task HandleLogin()
     {
@@ -139,12 +151,18 @@
     .FirstOrDefaultAsync(s => s.StaffUsername == staff.StaffUsername);
                 var wrongPasswordStaff = await _context.Staff
                 .FirstOrDefaultAsync(s => s.PasswordHash == staff.PasswordHash);
+
                 if (wrongPasswordStaff == null)
                 {
                     wrongPassword = true;
                 }
-                if (wrongUsernameStaff == null)
+                else if (wrongUsernameStaff == null)
                 {
+                    wrongUsername = true;
+                }
+                else if (wrongUsernameStaff.id == wrongPasswordStaff.id)
+                {
+                    wrongPassword = true;
                     wrongUsername = true;
                 }
             }     
@@ -162,6 +180,11 @@
         else if (password == "")
         {
             nullUsername = false;
+            nullPassword = true;
+        } 
+        else
+        {
+            nullUsername = true;
             nullPassword = true;
         }
     }
@@ -219,7 +242,7 @@
 
             doTruncateTable = false;
         }
-
+        await Task.Delay(500);
         StateHasChanged();
     }
     private string DocumentTitle
